@@ -1,11 +1,11 @@
 
-from setuptools import setup
+from setuptools import find_packages, setup
 
 setup(
     
     name = 'item2vec',
-    version = '0.1',
-    packages = ['item2vec'],
+    version = '0.1.1',
+    packages = find_packages(),
     
     author = 'Jojo le Barjos',
     author_email = 'jojolebarjos@gmail.com',
@@ -20,10 +20,10 @@ setup(
     ],
     
     classifiers = [
-        'Development Status :: 3 - Beta',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
-        'License :: Other/Proprietary License',
+        'License :: Freely Distributable',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3 :: Only',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
