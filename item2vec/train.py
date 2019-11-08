@@ -58,6 +58,7 @@ def train_packed_array(indices, lengths, num_labels, size=100, num_epochs=5, num
     '''
     
     # TODO accept weight at some point?
+    # TODO accept hierarchy somehow (i.e. ancestors/descendants are updated as well)
     
     # Check values
     assert size > 0
@@ -77,18 +78,15 @@ def train_packed_array(indices, lengths, num_labels, size=100, num_epochs=5, num
     tmp_syn0 = numpy.empty(size, dtype=numpy.float32)
     
     # Do training
-    _train(indices, lengths, syn0, syn1, tmp_syn0, num_labels, num_epochs, num_negatives, starting_alpha)
+    _train(indices, lengths, syn0, syn1, tmp_syn0, num_epochs, num_negatives, starting_alpha)
     
     # Return relevant objects
     return syn0, syn1
 
 
-# TODO clean and document these internal functions
-
-
 # Train using preprocess itemsets
-def _train(indices, lengths, syn0, syn1, tmp_syn0, num_labels, num_epochs, num_negatives, starting_alpha):
-    size = syn0.shape[1]
+def _train(indices, lengths, syn0, syn1, tmp_syn0, num_epochs, num_negatives, starting_alpha):
+    num_labels, size = syn0.shape
     
     # For each epoch
     # TODO add parameter to control/disable tqdm
@@ -104,7 +102,7 @@ def _train(indices, lengths, syn0, syn1, tmp_syn0, num_labels, num_epochs, num_n
                 alpha = (1 - offset / (indices.shape[0] + 1)) * starting_alpha
                 
                 # Apply optimized step
-                _step(indices, lengths, syn0, syn1, tmp_syn0, offset, length, alpha, size, num_labels, num_negatives)
+                do_step(indices, offset, length, syn0, syn1, tmp_syn0, num_negatives, alpha)
                 
                 # Move to next context
                 offset += length
@@ -113,7 +111,22 @@ def _train(indices, lengths, syn0, syn1, tmp_syn0, num_labels, num_epochs, num_n
 
 # Optimized training step
 @jit(nopython=True)
-def _step(indices, lengths, syn0, syn1, tmp_syn0, offset, length, alpha, size, num_labels, num_negatives):
+def do_step(indices, offset, length, syn0, syn1, tmp_syn0, num_negatives, alpha):
+    '''Apply a single training step.
+    
+    Args:
+        indices (int32, N): Item index array.
+        offset (int32): Start of itemset (inclusive) in array.
+        length (int32): Number of items in itemset.
+        syn0 (float32, num_labels x size): First set of embeddings.
+        syn1 (float32, num_labels x size): Second set of embeddings.
+        tmp_syn0 (float32, size): Internal buffer (allocated only once, for
+            performance).
+        num_negatives (int32): Number of negative samples.
+        alpha (float32): Learning rate.
+    
+    '''
+    num_labels, size = syn0.shape
     
     # Enumerate words
     for j in range(offset, offset + length):
@@ -142,7 +155,7 @@ def _step(indices, lengths, syn0, syn1, tmp_syn0, offset, length, alpha, size, n
                     f = numpy.dot(syn0[neighbor_word], syn1[target])
                     
                     # Compute gradient
-                    g = (label - _expit(f)) * alpha
+                    g = (label - expit(f)) * alpha
                     
                     # Backpropagate
                     for c in range(size):
@@ -155,5 +168,8 @@ def _step(indices, lengths, syn0, syn1, tmp_syn0, offset, length, alpha, size, n
 
 # Logistic function
 @jit(float32(float32), nopython=True)
-def _expit(x):
+def expit(x):
+    '''Compute logistic activation.
+    
+    '''
     return 1 / (1 + math.exp(-x))
