@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 
-import collections
 import math
 from numba import jit, float32
 import numpy
@@ -9,52 +8,82 @@ import random
 from tqdm import tqdm
 
 
-# Train embeddings for given itemsets
-def train(itemsets, size=128, min_count=5, num_epochs=5, num_negatives=5, starting_alpha=0.025):
+# TODO maybe add RNG as parameter?
+
+
+# Train embedding using concatenated arrays
+def train_packed_array(indices, lengths, num_labels, size=100, num_epochs=5, num_negatives=5, starting_alpha=0.025):
+    '''Train embeddings from packed indexed itemsets.
+    
+    For compactness and performance reasons, itemsets are stored in a one-
+    dimensional array. An additional array is therefore used to identify
+    boundaries, by specifying the length of each itemset.
+    
+    This uses skip-gram with negative sampling, as defined by Mikolov et al.
+    in word2vec. Default parameters are taken from official implementation.
+    
+    Args:
+        indices (int32, N): Item indices of the M itemsets, concatenated.
+        lengths (int32, M): Length of each itemset, concatenated.
+        num_labels (int32): Number of items, usually `max(indices)-1`.
+        size (int32): Embedding size (default 100).
+        num_epochs (int32): Number of passes over the whole input (default 5).
+        num_negatives (int32): Number of negative sample per item (default 5).
+        starting_alpha (float32): Initial learning rate, decaying linearly to
+            zero (default 0.025).
+    
+    Returns:
+        syn0 (float32, num_labels x size): First set of embeddings.
+        syn1 (float32, num_labels x size): Second set of embeddings.
+    
+    Example:
+        Toy dataset, specified directly as packed array.
+        
+        >>> indices = np.array([
+        ...     0, 3, 7, 2,
+        ...     1, 2,
+        ...     4, 5, 6, 0, 1
+        ... ])
+        >>> lengths = np.array([
+        ...     4,
+        ...     2,
+        ...     5
+        ... ])
+        >>> syn0, syn1 = train_packed_array(
+        ...     indices, lengths,
+        ...     num_labels = 8,
+        ...     size = 32,
+        ... )
+    
+    '''
+    
+    # TODO accept weight at some point?
     
     # Check values
     assert size > 0
-    assert min_count >= 0
     assert num_epochs > 0
     assert num_negatives >= 0
     assert starting_alpha > 0
     
-    # Count labels
-    counter = collections.Counter()
-    for itemset in itemsets:
-        counter.update(itemset)
+    # Initial first set of embeddings
+    syn0 = numpy.random.rand(num_labels, size).astype(numpy.float32)
+    syn0 -= 0.5
+    syn0 /= size
     
-    # Define label list
-    labels = [label for label, count in counter.most_common() if count >= min_count]
-    label_map = {label : i for i, label in enumerate(labels)}
+    # Complementary embedding set is initialized to 0
+    syn1 = numpy.zeros((num_labels, size), dtype=numpy.float32)
     
-    # Generate indices
-    all_indices = []
-    for itemset in itemsets:
-        # TODO accept weight
-        indices = []
-        for label in itemset:
-            label = label_map.get(label)
-            if label is not None:
-                indices.append(label)
-        if len(indices) > 1:
-            all_indices.append(indices)
+    # Internal buffer is also allocated
+    tmp_syn0 = numpy.empty(size, dtype=numpy.float32)
     
-    # Pack as flat array
-    lengths = numpy.array([len(indices) for indices in all_indices], dtype=numpy.intp)
-    indices = numpy.array([index for indices in all_indices for index in indices], dtype=numpy.intp)
-    assert len(indices) > 0
-    
-    # Initialize parameters
-    syn0 = (numpy.random.rand(len(labels), size).astype(dtype=numpy.float32) - 0.5) / size
-    syn1 = numpy.zeros((len(labels), size), dtype=numpy.float32)
-    tmp_syn0 = numpy.zeros(size, dtype=numpy.float32)
-    
-    # Train using optimized method
-    _train(indices, lengths, syn0, syn1, tmp_syn0, len(labels), num_epochs, num_negatives, starting_alpha)
+    # Do training
+    _train(indices, lengths, syn0, syn1, tmp_syn0, num_labels, num_epochs, num_negatives, starting_alpha)
     
     # Return relevant objects
-    return labels, syn0, syn1
+    return syn0, syn1
+
+
+# TODO clean and document these internal functions
 
 
 # Train using preprocess itemsets
@@ -62,6 +91,7 @@ def _train(indices, lengths, syn0, syn1, tmp_syn0, num_labels, num_epochs, num_n
     size = syn0.shape[1]
     
     # For each epoch
+    # TODO add parameter to control/disable tqdm
     with tqdm(total=num_epochs * indices.shape[0]) as progress:
         for epoch in range(num_epochs):
             
@@ -81,6 +111,7 @@ def _train(indices, lengths, syn0, syn1, tmp_syn0, num_labels, num_epochs, num_n
                 progress.update(length)
 
 
+# Optimized training step
 @jit(nopython=True)
 def _step(indices, lengths, syn0, syn1, tmp_syn0, offset, length, alpha, size, num_labels, num_negatives):
     
@@ -111,7 +142,7 @@ def _step(indices, lengths, syn0, syn1, tmp_syn0, offset, length, alpha, size, n
                     f = numpy.dot(syn0[neighbor_word], syn1[target])
                     
                     # Compute gradient
-                    g = (label - expit(f)) * alpha
+                    g = (label - _expit(f)) * alpha
                     
                     # Backpropagate
                     for c in range(size):
@@ -122,6 +153,7 @@ def _step(indices, lengths, syn0, syn1, tmp_syn0, offset, length, alpha, size, n
                     syn0[neighbor_word, c] += tmp_syn0[c]
 
 
+# Logistic function
 @jit(float32(float32), nopython=True)
-def expit(x):
+def _expit(x):
     return 1 / (1 + math.exp(-x))
