@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 
 # Train embedding using concatenated arrays
-def train_packed_array(indices, lengths, num_labels, size=100, num_epochs=5, num_negatives=5, starting_alpha=0.025):
+def train_packed_array(indices, lengths, num_labels=None, size=100, num_epochs=5, num_negatives=5, starting_alpha=0.025):
     '''Train embeddings from packed indexed itemsets.
     
     For compactness and performance reasons, itemsets are stored in a one-
@@ -25,7 +25,7 @@ def train_packed_array(indices, lengths, num_labels, size=100, num_epochs=5, num
     Args:
         indices (int32, N): Item indices of the M itemsets, concatenated.
         lengths (int32, M): Length of each itemset, concatenated.
-        num_labels (int32): Number of items, usually `max(indices)-1`.
+        num_labels (int32): Number of items (default `max(indices)+1`).
         size (int32): Embedding size (default 100).
         num_epochs (int32): Number of passes over the whole input (default 5).
         num_negatives (int32): Number of negative sample per item (default 5).
@@ -59,6 +59,13 @@ def train_packed_array(indices, lengths, num_labels, size=100, num_epochs=5, num
     
     # TODO accept weight at some point?
     # TODO accept hierarchy somehow (i.e. ancestors/descendants are updated as well)
+    
+    # Fill missing parameters
+    if num_labels is None:
+        if indices.size == 0:
+            num_labels = 1
+        else:
+            num_labels = indices.max() + 1
     
     # Check values
     assert size > 0
