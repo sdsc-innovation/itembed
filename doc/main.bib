@@ -1,0 +1,89 @@
+@InProceedings{pmlr-v9-gutmann10a,
+  title = 	 {Noise-contrastive estimation: A new estimation principle for unnormalized statistical models},
+  author = 	 {Michael Gutmann and Aapo Hyvärinen},
+  booktitle = 	 {Proceedings of the Thirteenth International Conference on Artificial Intelligence and Statistics},
+  pages = 	 {297--304},
+  year = 	 {2010},
+  editor = 	 {Yee Whye Teh and Mike Titterington},
+  volume = 	 {9},
+  series = 	 {Proceedings of Machine Learning Research},
+  address = 	 {Chia Laguna Resort, Sardinia, Italy},
+  month = 	 {13--15 May},
+  publisher = 	 {PMLR},
+  pdf = 	 {http://proceedings.mlr.press/v9/gutmann10a/gutmann10a.pdf},
+  url = 	 {http://proceedings.mlr.press/v9/gutmann10a.html},
+  abstract = 	 {We present a new estimation principle for parameterized statistical models. The idea is to perform nonlinear logistic regression to discriminate between the observed data and some artificially generated noise, using the model log-density function in the regression nonlinearity.  We show that this leads to a consistent (convergent) estimator of the parameters, and analyze the asymptotic variance.  In particular, the method is shown to directly work for unnormalized models, i.e. models where the density function does not integrate to one. The normalization constant can be estimated just like any other parameter. For a tractable ICA model, we compare the method with other estimation methods that can be used to learn unnormalized models, including score matching, contrastive divergence, and maximum-likelihood where the normalization constant is estimated with importance sampling. Simulations show that noise-contrastive estimation offers the best trade-off between computational and statistical efficiency. The method is then applied to the modeling of natural images: We show that the method can successfully estimate a large-scale two-layer model and a Markov random field.}
+}
+
+@article{mnih2012fast,
+  title={A fast and simple algorithm for training neural probabilistic language models},
+  author={Mnih, Andriy and Teh, Yee Whye},
+  journal={arXiv preprint arXiv:1206.6426},
+  year={2012}
+}
+
+@inproceedings{vaswani-etal-2013-decoding,
+    title = "Decoding with Large-Scale Neural Language Models Improves Translation",
+    author = "Vaswani, Ashish  and
+      Zhao, Yinggong  and
+      Fossum, Victoria  and
+      Chiang, David",
+    booktitle = "Proceedings of the 2013 Conference on Empirical Methods in Natural Language Processing",
+    month = oct,
+    year = "2013",
+    address = "Seattle, Washington, USA",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/D13-1140",
+    pages = "1387--1392",
+}
+
+@inproceedings{zoph-fast,
+author = {Zoph, Barret and Vaswani, Ashish and May, Jonathan and Knight, Kevin},
+year = {2016},
+month = {01},
+pages = {1217-1222},
+title = {Simple, Fast Noise-Contrastive Estimation for Large RNN Vocabularies},
+doi = {10.18653/v1/N16-1145}
+}
+
+@inproceedings{Mikolov2013DistributedRO,
+  title={Distributed Representations of Words and Phrases and their Compositionality},
+  author={Tomas Mikolov and Ilya Sutskever and Kai Chen and Gregory S. Corrado and Jeffrey Dean},
+  booktitle={NIPS},
+  year={2013}
+}
+
+@article{Goldberg2014word2vecED,
+  title={word2vec Explained: deriving Mikolov et al.'s negative-sampling word-embedding method},
+  author={Yoav Goldberg and Omer Levy},
+  journal={ArXiv},
+  year={2014},
+  volume={abs/1402.3722}
+}
+
+@inproceedings{devlin-etal-2014-fast,
+    title = "Fast and Robust Neural Network Joint Models for Statistical Machine Translation",
+    author = "Devlin, Jacob  and
+      Zbib, Rabih  and
+      Huang, Zhongqiang  and
+      Lamar, Thomas  and
+      Schwartz, Richard  and
+      Makhoul, John",
+    booktitle = "Proceedings of the 52nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)",
+    month = jun,
+    year = "2014",
+    address = "Baltimore, Maryland",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/P14-1129",
+    doi = "10.3115/v1/P14-1129",
+    pages = "1370--1380",
+}
+
+@inproceedings{andreas-norm,
+author = {Andreas, Jacob and Klein, Dan},
+year = {2015},
+month = {01},
+pages = {244-249},
+title = {When and why are log-linear models self-normalizing?},
+doi = {10.3115/v1/N15-1027}
+}
