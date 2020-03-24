@@ -109,12 +109,13 @@ def _train(indices, lengths, syn0, syn1, tmp_syn0, num_epochs, num_negatives, st
             offset = 0
             for i in range(lengths.shape[0]):
                 length = lengths[i]
+                if length >= 2:
                 
-                # Update learning rate
-                alpha = (1 - step / step_count) * starting_alpha
-                
-                # Apply optimized step
-                do_step(indices, offset, length, syn0, syn1, tmp_syn0, num_negatives, alpha)
+                    # Update learning rate
+                    alpha = (1 - step / step_count) * starting_alpha
+                    
+                    # Apply optimized step
+                    do_step(indices, offset, length, syn0, syn1, tmp_syn0, num_negatives, alpha)
                 
                 # Move to next context
                 step += length
@@ -145,38 +146,39 @@ def do_step(indices, offset, length, syn0, syn1, tmp_syn0, num_negatives, alpha)
     for j in range(offset, offset + length):
         word = indices[j]
         
-        # For each neighbor
-        for k in range(offset, offset + length):
-            if j != k:
-                neighbor_word = indices[k]
-                
-                # Approximate softmax update
-                tmp_syn0[:] = 0
-                for n in range(num_negatives + 1):
-                    
-                    # Apply a single positive update
-                    if n == 0:
-                        target = word
-                        label = 1
-                    
-                    # And several negative updates
-                    else:
-                        target = random.randint(0, num_labels - 1) # TODO check that it is not equal to true label
-                        label = 0
-                    
-                    # Compute dot product between reference and target
-                    f = numpy.dot(syn0[neighbor_word], syn1[target])
-                    
-                    # Compute gradient
-                    g = (label - expit(f)) * alpha
-                    
-                    # Backpropagate
-                    for c in range(size):
-                        tmp_syn0[c] += g * syn1[target, c]
-                    for c in range(size):
-                        syn1[target, c] += g * syn0[neighbor_word, c]
-                for c in range(size):
-                    syn0[neighbor_word, c] += tmp_syn0[c]
+        # Choose a single random neighbor
+        k = offset + random.randint(0, length - 2)
+        if k >= j:
+            k += 1
+        neighbor_word = indices[k]
+        
+        # Approximate softmax update
+        tmp_syn0[:] = 0
+        for n in range(num_negatives + 1):
+            
+            # Apply a single positive update
+            if n == 0:
+                target = word
+                label = 1
+            
+            # And several negative updates
+            else:
+                target = random.randint(0, num_labels - 1) # TODO check that it is not equal to true label
+                label = 0
+            
+            # Compute dot product between reference and target
+            f = numpy.dot(syn0[neighbor_word], syn1[target])
+            
+            # Compute gradient
+            g = (label - expit(f)) * alpha
+            
+            # Backpropagate
+            for c in range(size):
+                tmp_syn0[c] += g * syn1[target, c]
+            for c in range(size):
+                syn1[target, c] += g * syn0[neighbor_word, c]
+        for c in range(size):
+            syn0[neighbor_word, c] += tmp_syn0[c]
 
 
 # Logistic function
