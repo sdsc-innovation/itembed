@@ -38,6 +38,15 @@ for i in numpy.argsort(-distances)[:10]:
 ```
 
 
+## Performance improvement
+
+As [suggested](https://numba.pydata.org/numba-doc/dev/user/performance-tips.html#intel-svml) in Numba's documentation, Intel's short vector math library can be used to increase performances:
+
+```
+conda install -c numba icc_rt
+```
+
+
 ## Relevant links
 
  * Hierarchy-related:
@@ -47,3 +56,16 @@ for i in numpy.argsort(-distances)[:10]:
     * [ORDER-EMBEDDINGS OF IMAGES AND LANGUAGE](https://arxiv.org/pdf/1511.06361.pdf)
     * [HIERARCHICAL DENSITY ORDER EMBEDDINGS](https://arxiv.org/pdf/1804.09843.pdf)
     * [Entity Hierarchy Embedding](http://www.cs.cmu.edu/~poyaoh/data/acl15entity.pdf)
+
+
+## Changelog
+
+ * 0.2.1 - 2020-03-24
+    * Fix label count argument
+    * Fix learning rate issue
+    * Add optimization flags to Numba JIT
+ * 0.2.0 - 2019-11-08
+    * Clean and refactor
+    * Allow training from plain arrays
+ * 0.1.0 - 2019-09-13
+    * Initial version
