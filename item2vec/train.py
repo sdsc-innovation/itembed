@@ -85,7 +85,10 @@ def train_packed_array(indices, lengths, num_labels=None, size=100, num_epochs=5
     tmp_syn0 = numpy.empty(size, dtype=numpy.float32)
     
     # Do training
-    _train(indices, lengths, syn0, syn1, tmp_syn0, num_epochs, num_negatives, starting_alpha)
+    try:
+        _train(indices, lengths, syn0, syn1, tmp_syn0, num_epochs, num_negatives, starting_alpha)
+    except KeyboardInterrupt:
+        pass
     
     # Return relevant objects
     return syn0, syn1

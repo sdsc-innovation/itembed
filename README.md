@@ -61,6 +61,7 @@ conda install -c numba icc_rt
 ## Changelog
 
  * 0.2.1 - 2020-03-24
+    * Allow keyboard interruption
     * Fix label count argument
     * Fix learning rate issue
     * Add optimization flags to Numba JIT
