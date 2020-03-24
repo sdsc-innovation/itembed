@@ -97,7 +97,9 @@ def _train(indices, lengths, syn0, syn1, tmp_syn0, num_epochs, num_negatives, st
     
     # For each epoch
     # TODO add parameter to control/disable tqdm
-    with tqdm(total=num_epochs * indices.shape[0]) as progress:
+    step = 0
+    step_count = num_epochs * indices.shape[0]
+    with tqdm(total=step_count) as progress:
         for epoch in range(num_epochs):
             
             # For each context
@@ -106,12 +108,13 @@ def _train(indices, lengths, syn0, syn1, tmp_syn0, num_epochs, num_negatives, st
                 length = lengths[i]
                 
                 # Update learning rate
-                alpha = (1 - offset / (indices.shape[0] + 1)) * starting_alpha
+                alpha = (1 - step / step_count) * starting_alpha
                 
                 # Apply optimized step
                 do_step(indices, offset, length, syn0, syn1, tmp_syn0, num_negatives, alpha)
                 
                 # Move to next context
+                step += length
                 offset += length
                 progress.update(length)
 
