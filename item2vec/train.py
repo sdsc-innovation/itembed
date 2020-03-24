@@ -120,7 +120,7 @@ def _train(indices, lengths, syn0, syn1, tmp_syn0, num_epochs, num_negatives, st
 
 
 # Optimized training step
-@jit(nopython=True)
+@jit(nopython=True, nogil=True, fastmath=True)
 def do_step(indices, offset, length, syn0, syn1, tmp_syn0, num_negatives, alpha):
     '''Apply a single training step.
     
@@ -177,7 +177,7 @@ def do_step(indices, offset, length, syn0, syn1, tmp_syn0, num_negatives, alpha)
 
 
 # Logistic function
-@jit(float32(float32), nopython=True)
+@jit(float32(float32), nopython=True, nogil=True, fastmath=True)
 def expit(x):
     '''Compute logistic activation.
     

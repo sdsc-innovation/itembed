@@ -36,3 +36,14 @@ print(f'#{ref} {labels[ref]}:')
 for i in numpy.argsort(-distances)[:10]:
     print(f'  #{i} {labels[i]} ({distances[i]:0.4f})')
 ```
+
+
+## Relevant links
+
+ * Hierarchy-related:
+    * [Joint Learning of Hierarchical Word Embeddings from a Corpus and a Taxonomy](https://openreview.net/forum?id=S1xf-W5paX)
+    * [Probabilistic Embedding of Knowledge Graphs with Box Lattice Measures](https://arxiv.org/abs/1805.06627)
+    * [Improved Representation Learning for Predicting Commonsense Ontologies](https://arxiv.org/pdf/1708.00549.pdf)
+    * [ORDER-EMBEDDINGS OF IMAGES AND LANGUAGE](https://arxiv.org/pdf/1511.06361.pdf)
+    * [HIERARCHICAL DENSITY ORDER EMBEDDINGS](https://arxiv.org/pdf/1804.09843.pdf)
+    * [Entity Hierarchy Embedding](http://www.cs.cmu.edu/~poyaoh/data/acl15entity.pdf)
