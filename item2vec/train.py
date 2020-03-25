@@ -7,6 +7,8 @@ import numpy
 import random
 from tqdm import tqdm
 
+from .optimization import do_unsupervised_steps
+
 
 # TODO maybe add RNG as parameter?
 
@@ -115,76 +117,9 @@ def _train(indices, lengths, syn0, syn1, tmp_syn0, num_epochs, num_negatives, st
                     alpha = (1 - step / step_count) * starting_alpha
                     
                     # Apply optimized step
-                    do_step(indices, offset, length, syn0, syn1, tmp_syn0, num_negatives, alpha)
+                    do_unsupervised_steps(indices, offset, length, syn0, syn1, tmp_syn0, num_negatives, alpha)
                 
                 # Move to next context
                 step += length
                 offset += length
                 progress.update(length)
-
-
-# Optimized training step
-@jit(nopython=True, nogil=True, fastmath=True)
-def do_step(indices, offset, length, syn0, syn1, tmp_syn0, num_negatives, alpha):
-    '''Apply a single training step.
-    
-    Args:
-        indices (int32, N): Item index array.
-        offset (int32): Start of itemset (inclusive) in array.
-        length (int32): Number of items in itemset.
-        syn0 (float32, num_labels x size): First set of embeddings.
-        syn1 (float32, num_labels x size): Second set of embeddings.
-        tmp_syn0 (float32, size): Internal buffer (allocated only once, for
-            performance).
-        num_negatives (int32): Number of negative samples.
-        alpha (float32): Learning rate.
-    
-    '''
-    num_labels, size = syn0.shape
-    
-    # Enumerate words
-    for j in range(offset, offset + length):
-        word = indices[j]
-        
-        # Choose a single random neighbor
-        k = offset + random.randint(0, length - 2)
-        if k >= j:
-            k += 1
-        neighbor_word = indices[k]
-        
-        # Approximate softmax update
-        tmp_syn0[:] = 0
-        for n in range(num_negatives + 1):
-            
-            # Apply a single positive update
-            if n == 0:
-                target = word
-                label = 1
-            
-            # And several negative updates
-            else:
-                target = random.randint(0, num_labels - 1) # TODO check that it is not equal to true label
-                label = 0
-            
-            # Compute dot product between reference and target
-            f = numpy.dot(syn0[neighbor_word], syn1[target])
-            
-            # Compute gradient
-            g = (label - expit(f)) * alpha
-            
-            # Backpropagate
-            for c in range(size):
-                tmp_syn0[c] += g * syn1[target, c]
-            for c in range(size):
-                syn1[target, c] += g * syn0[neighbor_word, c]
-        for c in range(size):
-            syn0[neighbor_word, c] += tmp_syn0[c]
-
-
-# Logistic function
-@jit(float32(float32), nopython=True, nogil=True, fastmath=True)
-def expit(x):
-    '''Compute logistic activation.
-    
-    '''
-    return 1 / (1 + math.exp(-x))

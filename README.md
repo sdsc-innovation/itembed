@@ -19,7 +19,7 @@ itemsets = [
 ]
 
 # Train using skip-gram
-labels, syn0, syn1 = train(itemsets, size=64)
+labels, syn0, syn1 = train(itemsets, size=64, min_count=1)
 
 # Both embedding sets are usable, just choose one
 syn = syn0
