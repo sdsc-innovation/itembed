@@ -117,7 +117,7 @@ def _train(indices, lengths, syn0, syn1, tmp_syn0, num_epochs, num_negatives, st
                     alpha = (1 - step / step_count) * starting_alpha
                     
                     # Apply optimized step
-                    do_unsupervised_steps(indices, offset, length, syn0, syn1, tmp_syn0, num_negatives, alpha)
+                    do_unsupervised_steps(indices[offset:offset + length], syn0, syn1, tmp_syn0, num_negatives, alpha)
                 
                 # Move to next context
                 step += length

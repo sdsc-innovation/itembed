@@ -8,8 +8,19 @@ from numba import jit, float32
 
 
 @jit(nopython=True, nogil=True, fastmath=True)
-def do_unsupervised_steps(indices, offset, length, syn0, syn1, tmp_syn, num_negative, learning_rate):
-    """Apply a single training step.
+def do_unsupervised_steps(
+    indices,
+    syn0,
+    syn1,
+    tmp_syn,
+    num_negative,
+    learning_rate,
+):
+    """Apply steps from a single itemset.
+
+    This is used in an unsupervised setting, where co-occurrence is used as a
+    knowledge source. It follows the skip-gram method, as introduced by Mikolov
+    et al.
 
     Args:
         indices (int32, N): Item index array.
@@ -27,22 +38,52 @@ def do_unsupervised_steps(indices, offset, length, syn0, syn1, tmp_syn, num_nega
     num_label, num_dimension = syn0.shape
 
     # Enumerate words
-    for j in range(offset, offset + length):
+    length = indices.shape[0]
+    for j in range(length):
         left = indices[j]
 
         # Choose a single random neighbor
-        k = offset + random.randint(0, length - 2)
+        k = random.randint(0, length - 2)
         if k >= j:
             k += 1
         right = indices[k]
 
         # Apply update
-        do_step(left, right, syn0, syn1, tmp_syn, num_label, num_dimension, num_negative, learning_rate)
+        do_step(
+            left, right,
+            syn0, syn1, tmp_syn,
+            num_label, num_dimension, num_negative,
+            learning_rate
+        )
 
 
 @jit(nopython=True, nogil=True, fastmath=True)
-def do_step(left, right, syn_left, syn_right, tmp_syn_left, num_right, num_dimension, num_negative, learning_rate):
-    """Apply a single training step."""
+def do_step(
+    left,
+    right,
+    syn_left,
+    syn_right,
+    tmp_syn_left,
+    num_right,
+    num_dimension,
+    num_negative,
+    learning_rate,
+):
+    """Apply a single training step.
+
+    Args:
+        left (int32): left-hand item.
+        right (int32): right-hand item.
+        syn_left (float32, num_left x num_dimension): left-hand embeddings.
+        syn_right (float32, num_right x num_dimension): right-hand embeddings.
+        tmp_syn_left (float32, num_dimension): internal buffer (allocated only
+            once, for performance).
+        num_right (int32): number of right-hand items.
+        num_dimension (int32): size of embeddings.
+        num_negative (int32): number of negative samples.
+        learning_rate (int32): learning rate.
+
+    """
 
     # Approximate softmax update
     tmp_syn_left[:] = 0
