@@ -1,6 +1,12 @@
-# -*- coding: utf-8 -*-
 
+from .optimization import (
+    do_unsupervised_steps,
+    do_step,
+    expit,
+)
 
-from .optimization import do_unsupervised_steps
-from .train import train_packed_array
-from .preprocess import train
+from .util import (
+    pack_itemsets,
+    initialize_syn,
+    train,
+)

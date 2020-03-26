@@ -9,7 +9,7 @@ pip install git+https://gitlab.com/jojolebarjos/item2vec.git
 
 ```python
 from item2vec import train
-import numpy
+import numpy as np
 
 # Get your own itemsets
 itemsets = [
@@ -19,13 +19,13 @@ itemsets = [
 ]
 
 # Train using skip-gram
-labels, syn0, syn1 = train(itemsets, size=64, min_count=1)
+labels, syn0, syn1 = train(itemsets, num_dimension=64, min_count=1)
 
 # Both embedding sets are usable, just choose one
 syn = syn0
 
 # Normalize for comparison
-n_syn = syn / numpy.sqrt((syn ** 2).sum(axis=1))[:, None]
+n_syn = syn / np.sqrt((syn ** 2).sum(axis=1))[:, None]
 
 # Compute cosine distances to all other labels
 ref = labels.index('apple')
@@ -33,7 +33,7 @@ distances = n_syn @ n_syn[ref]
 
 # Show closest neighbors
 print(f'#{ref} {labels[ref]}:')
-for i in numpy.argsort(-distances)[:10]:
+for i in np.argsort(-distances)[:10]:
     print(f'  #{i} {labels[i]} ({distances[i]:0.4f})')
 ```
 

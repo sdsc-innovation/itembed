@@ -23,15 +23,13 @@ def do_unsupervised_steps(
     et al.
 
     Args:
-        indices (int32, N): Item index array.
-        offset (int32): Start of itemset (inclusive) in array.
-        length (int32): Number of items in itemset.
-        syn0 (float32, num_label x num_dimension): First set of embeddings.
-        syn1 (float32, num_label x num_dimension): Second set of embeddings.
-        tmp_syn (float32, num_dimension): Internal buffer (allocated only once,
+        indices (int32, length): itemset.
+        syn0 (float32, num_label x num_dimension): first set of embeddings.
+        syn1 (float32, num_label x num_dimension): second set of embeddings.
+        tmp_syn (float32, num_dimension): internal buffer (allocated only once,
             for performance).
-        num_negative (int32): Number of negative samples.
-        learning_rate (float32): Learning rate.
+        num_negative (int32): number of negative samples.
+        learning_rate (float32): learning rate.
 
     """
 
@@ -63,7 +61,7 @@ def do_step(
     right,
     syn_left,
     syn_right,
-    tmp_syn_left,
+    tmp_syn,
     num_right,
     num_dimension,
     num_negative,
@@ -76,9 +74,9 @@ def do_step(
         right (int32): right-hand item.
         syn_left (float32, num_left x num_dimension): left-hand embeddings.
         syn_right (float32, num_right x num_dimension): right-hand embeddings.
-        tmp_syn_left (float32, num_dimension): internal buffer (allocated only
-            once, for performance).
-        num_right (int32): number of right-hand items.
+        tmp_syn (float32, num_dimension): internal buffer (allocated only once,
+            for performance).
+        num_right (int32): number of right-hand labels.
         num_dimension (int32): size of embeddings.
         num_negative (int32): number of negative samples.
         learning_rate (int32): learning rate.
@@ -86,7 +84,7 @@ def do_step(
     """
 
     # Approximate softmax update
-    tmp_syn_left[:] = 0
+    tmp_syn[:] = 0
     for n in range(num_negative + 1):
 
         # Apply a single positive update
@@ -107,7 +105,7 @@ def do_step(
 
         # Accumulate gradients for left-hand embeddings
         for c in range(num_dimension):
-            tmp_syn_left[c] += gradient * syn_right[target, c]
+            tmp_syn[c] += gradient * syn_right[target, c]
 
         # Backpropagate to right-hand embeddings
         for c in range(num_dimension):
@@ -115,7 +113,7 @@ def do_step(
 
     # Backpropagate to left-hand embeddings
     for c in range(num_dimension):
-        syn_left[left, c] += tmp_syn_left[c]
+        syn_left[left, c] += tmp_syn[c]
 
 
 @jit(float32(float32), nopython=True, nogil=True, fastmath=True)
