@@ -5,7 +5,7 @@ import numpy as np
 
 from tqdm import tqdm
 
-from .optimization import do_unsupervised_steps
+from .optimization import do_unsupervised_batch
 
 
 def pack_itemsets(itemsets, min_count=1, min_length=2):
@@ -83,9 +83,24 @@ def train(
     num_dimension=100,
     num_epoch=5,
     num_negative=5,
-    starting_alpha=0.025,
+    initial_learning_rate=0.025,
 ):
     """Train embeddings from collections.
+
+    Args:
+        itemsets (list of list of object): list of sets of hashable objects.
+        min_count (int): minimal frequency count to be kept (default: 1).
+        min_length (int): minimal itemset length (default: 2).
+        num_dimension (int): embedding size (default: 100).
+        num_epoch (int): number of passes over the whole input (default: 5).
+        num_negative (int): number of negative samples (default: 5).
+        initial_learning_rate (float): initial learning rate, decreasing
+            linearly (default: 0.025).
+
+    Returns:
+        labels (list of object): vocabulary.
+        syn0 (float32, num_label x num_dimension): first set of embeddings.
+        syn1 (float32, num_label x num_dimension): second set of embeddings.
 
     Example:
         Toy dataset, where items are strings:
@@ -101,38 +116,90 @@ def train(
 
     labels, indices, offsets = pack_itemsets(itemsets, min_count, min_length)
     num_label = len(labels)
+
     syn0 = initialize_syn(num_label, num_dimension)
     syn1 = initialize_syn(num_label, num_dimension, method='zero')
-    _train(indices, offsets, syn0, syn1, num_epoch, num_negative, starting_alpha)
+
+    train_packed_arrays(
+        indices,
+        offsets,
+        syn0,
+        syn1,
+        num_epoch,
+        num_negative,
+        initial_learning_rate,
+    )
+
     return labels, syn0, syn1
 
 
-def _train(indices, offsets, syn0, syn1, num_epoch, num_negative, starting_alpha):
+def train_packed_arrays(
+    items,
+    offsets,
+    syn0,
+    syn1,
+    num_epoch=5,
+    num_negative=5,
+    initial_learning_rate=0.025,
+    batch_size=32,
+):
+    """Train embeddings from packed arrays.
+
+    Args:
+        items (int32, num_item): itemsets, concatenated.
+        offsets (int32, num_itemset + 1): boundaries in packed items.
+        syn0 (float32, num_label x num_dimension): first set of embeddings.
+        syn1 (float32, num_label x num_dimension): second set of embeddings.
+        num_epoch (int): number of passes over the whole input (default: 5).
+        num_negative (int): number of negative samples (default: 5).
+        initial_learning_rate (float): initial learning rate, decreasing
+            linearly (default: 0.025).
+        batch_size (int): number of itemsets per batch (default: 32).
+
+    """
+
     num_label, num_dimension = syn0.shape
     num_itemset = offsets.shape[0] - 1
     tmp_syn = np.empty(num_dimension, dtype=np.float32)
-    try:
+    indices = np.arange(num_itemset, dtype=np.int32)
 
-        step = 0
-        step_count = num_epoch * indices.shape[0]
-        with tqdm(total=step_count) as progress:
+    num_batch = (num_itemset - 1) // batch_size + 1
+    num_step = num_epoch * num_itemset
+    step = 0
+
+    try:
+        with tqdm(total=num_step) as progress:
             for epoch in range(num_epoch):
 
-                # For each context
-                for i in range(num_itemset):
-                    itemset = indices[offsets[i]:offsets[i + 1]]
-                    length = itemset.shape[0]
-                    if length >= 2:
+                # Shuffle itemsets
+                np.random.shuffle(indices)
 
-                        # Update learning rate
-                        alpha = (1 - step / step_count) * starting_alpha
+                # For each batch
+                for batch in range(num_batch):
+                    start = batch * batch_size
+                    end = (batch + 1) * batch_size
+                    batch_indices = indices[start:end]
 
-                        # Apply optimized step
-                        do_unsupervised_steps(itemset, syn0, syn1, tmp_syn, num_negative, alpha)
+                    # Learning rate decreases linearly
+                    learning_rate = (1 - step / num_step) * initial_learning_rate
 
-                    # Move to next context
-                    step += length
-                    progress.update(length)
+                    # Delegate to optimized method
+                    do_unsupervised_batch(
+                        items,
+                        offsets,
+                        batch_indices,
+                        syn0,
+                        syn1,
+                        tmp_syn,
+                        num_negative,
+                        learning_rate,
+                    )
 
+                    # Update progress
+                    count = batch_indices.shape[0]
+                    step += count
+                    progress.update(count)
+
+    # Allow soft interruption
     except KeyboardInterrupt:
         pass

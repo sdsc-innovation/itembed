@@ -9,4 +9,5 @@ from .util import (
     pack_itemsets,
     initialize_syn,
     train,
+    train_packed_arrays,
 )

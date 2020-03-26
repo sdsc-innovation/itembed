@@ -8,8 +8,50 @@ from numba import jit, float32
 
 
 @jit(nopython=True, nogil=True, fastmath=True)
-def do_unsupervised_steps(
+def do_unsupervised_batch(
+    items,
+    offsets,
     indices,
+    syn0,
+    syn1,
+    tmp_syn,
+    num_negative,
+    learning_rate,
+):
+    """Apply steps from multiple itemsets.
+
+    This is used in an unsupervised setting, where co-occurrence is used as a
+    knowledge source. It follows the skip-gram method, as introduced by Mikolov
+    et al.
+
+    Args:
+        items (int32, num_item): itemsets, concatenated.
+        offsets (int32, num_itemset + 1): boundaries in packed items.
+        indices (int32, num_step): subset of offsets to consider.
+        syn0 (float32, num_label x num_dimension): first set of embeddings.
+        syn1 (float32, num_label x num_dimension): second set of embeddings.
+        tmp_syn (float32, num_dimension): internal buffer (allocated only once,
+            for performance).
+        num_negative (int32): number of negative samples.
+        learning_rate (float32): learning rate.
+
+    """
+
+    num_itemset = indices.shape[0]
+    for index in indices:
+        do_unsupervised_steps(
+            items[offsets[index]:offsets[index+1]],
+            syn0,
+            syn1,
+            tmp_syn,
+            num_negative,
+            learning_rate,
+        )
+
+
+@jit(nopython=True, nogil=True, fastmath=True)
+def do_unsupervised_steps(
+    itemset,
     syn0,
     syn1,
     tmp_syn,
@@ -23,7 +65,7 @@ def do_unsupervised_steps(
     et al.
 
     Args:
-        indices (int32, length): itemset.
+        itemset (int32, length): items.
         syn0 (float32, num_label x num_dimension): first set of embeddings.
         syn1 (float32, num_label x num_dimension): second set of embeddings.
         tmp_syn (float32, num_dimension): internal buffer (allocated only once,
@@ -34,17 +76,17 @@ def do_unsupervised_steps(
     """
 
     num_label, num_dimension = syn0.shape
+    length = itemset.shape[0]
 
     # Enumerate words
-    length = indices.shape[0]
     for j in range(length):
-        left = indices[j]
+        left = itemset[j]
 
         # Choose a single random neighbor
         k = random.randint(0, length - 2)
         if k >= j:
             k += 1
-        right = indices[k]
+        right = itemset[k]
 
         # Apply update
         do_step(
@@ -53,6 +95,9 @@ def do_unsupervised_steps(
             num_label, num_dimension, num_negative,
             learning_rate
         )
+
+
+# TODO do_supervised_steps
 
 
 @jit(nopython=True, nogil=True, fastmath=True)
@@ -77,7 +122,7 @@ def do_step(
         tmp_syn (float32, num_dimension): internal buffer (allocated only once,
             for performance).
         num_right (int32): number of right-hand labels.
-        num_dimension (int32): size of embeddings.
+        num_dimension (int32): embedding size.
         num_negative (int32): number of negative samples.
         learning_rate (int32): learning rate.
 
