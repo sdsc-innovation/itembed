@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 setup(
     
     name = 'item2vec',
-    version = '0.2.1',
+    version = '0.3.0',
     packages = find_packages(),
     
     author = 'Jojo le Barjos',

@@ -60,6 +60,8 @@ conda install -c numba icc_rt
 
 ## Changelog
 
+ * 0.3.0 - 2020-03-26
+    * Complete refactor to increase performances and reusability
  * 0.2.1 - 2020-03-24
     * Allow keyboard interruption
     * Fix label count argument

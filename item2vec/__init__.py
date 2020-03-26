@@ -1,5 +1,6 @@
 
 from .optimization import (
+    do_unsupervised_batch,
     do_unsupervised_steps,
     do_step,
     expit,

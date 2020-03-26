@@ -141,7 +141,7 @@ def train_packed_arrays(
     num_epoch=5,
     num_negative=5,
     initial_learning_rate=0.025,
-    batch_size=32,
+    batch_size=64,
 ):
     """Train embeddings from packed arrays.
 
