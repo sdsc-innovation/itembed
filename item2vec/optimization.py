@@ -27,8 +27,6 @@ def expit(x):
         float32[:, ::1],
         float32[::1],
         int32,
-        int32,
-        int32,
         float32,
     ),
     nopython=True,
@@ -41,8 +39,6 @@ def do_step(
     syn_left,
     syn_right,
     tmp_syn,
-    num_right,
-    num_dimension,
     num_negative,
     learning_rate,
 ):
@@ -55,12 +51,12 @@ def do_step(
         syn_right (float32, num_right x num_dimension): right-hand embeddings.
         tmp_syn (float32, num_dimension): internal buffer (allocated only once,
             for performance).
-        num_right (int32): number of right-hand labels.
-        num_dimension (int32): embedding size.
         num_negative (int32): number of negative samples.
         learning_rate (int32): learning rate.
 
     """
+
+    num_right, num_dimension = syn_right.shape
 
     # Approximate softmax update
     tmp_syn[:] = 0
@@ -150,8 +146,7 @@ def do_unsupervised_steps(
         do_step(
             left, right,
             syn0, syn1, tmp_syn,
-            num_label, num_dimension, num_negative,
-            learning_rate
+            num_negative, learning_rate
         )
 
 
@@ -199,7 +194,6 @@ def do_unsupervised_batch(
 
     """
 
-    num_itemset = indices.shape[0]
     for index in indices:
         do_unsupervised_steps(
             items[offsets[index]:offsets[index+1]],
