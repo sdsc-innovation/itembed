@@ -118,6 +118,13 @@ def do_unsupervised_steps(
     knowledge source. It follows the skip-gram method, as introduced by Mikolov
     et al.
 
+    For each item, a single random neighbor is sampled to define a pair. This
+    means that only a subset of possible pairs is considered. The reason is
+    twofold: training stays in linear complexity w.r.t. itemset lengths and
+    large itemsets do not dominate smaller ones.
+
+    Itemset must have at least 2 items. Length is not checked, for efficiency.
+
     Args:
         itemset (int32, length): items.
         syn0 (float32, num_label x num_dimension): first set of embeddings.
@@ -154,6 +161,58 @@ def do_unsupervised_steps(
     void(
         int32[:],
         int32[:],
+        float32[:, ::1],
+        float32[:, ::1],
+        float32[::1],
+        int32,
+        float32,
+    ),
+    nopython=True,
+    nogil=True,
+    fastmath=True,
+)
+def do_supervised_steps(
+    left_itemset,
+    right_itemset,
+    left_syn,
+    right_syn,
+    tmp_syn,
+    num_negative,
+    learning_rate,
+):
+    """Apply steps from a two itemsets.
+
+    This is used in a supervised setting, where left-hand items are features
+    and right-hand items are labels.
+
+    Args:
+        left_itemset (int32, left_length): feature items.
+        right_itemset (int32, right_length): label items.
+        left_syn (float32, num_left_label x num_dimension): feature embeddings.
+        right_syn (float32, num_right_label x num_dimension): label embeddings.
+        tmp_syn (float32, num_dimension): internal buffer (allocated only once,
+            for performance).
+        num_negative (int32): number of negative samples.
+        learning_rate (float32): learning rate.
+
+    """
+
+    # For each pair
+    for left in left_itemset:
+        for right in right_itemset:
+
+            # Apply update
+            do_step(
+                left, right,
+                left_syn, right_syn, tmp_syn,
+                num_negative, learning_rate
+            )
+
+
+@jit(
+    void(
+        int32[:],
+        int32[:],
         int32[:],
         float32[:, ::1],
         float32[:, ::1],
@@ -175,11 +234,9 @@ def do_unsupervised_batch(
     num_negative,
     learning_rate,
 ):
-    """Apply steps from multiple itemsets.
+    """Apply unsupervised steps from multiple itemsets.
 
-    This is used in an unsupervised setting, where co-occurrence is used as a
-    knowledge source. It follows the skip-gram method, as introduced by Mikolov
-    et al.
+    See `do_unsupervised_steps` for more information.
 
     Args:
         items (int32, num_item): itemsets, concatenated.
@@ -194,11 +251,67 @@ def do_unsupervised_batch(
 
     """
 
-    for index in indices:
+    for i in indices:
         do_unsupervised_steps(
-            items[offsets[index]:offsets[index+1]],
+            items[offsets[i]:offsets[i+1]],
             syn0,
             syn1,
+            tmp_syn,
+            num_negative,
+            learning_rate,
+        )
+
+
+@jit(
+    void(
+        int32[:],
+        int32[:],
+        int32[:, :],
+        float32[:, ::1],
+        float32[:, ::1],
+        float32[::1],
+        int32,
+        float32,
+    ),
+    nopython=True,
+    nogil=True,
+    fastmath=True,
+)
+def do_supervised_batch(
+    items,
+    offsets,
+    indices,
+    left_syn,
+    right_syn,
+    tmp_syn,
+    num_negative,
+    learning_rate,
+):
+    """Apply supervised steps from multiple itemsets.
+
+    See `do_supervised_steps` for more information.
+
+    Args:
+        items (int32, num_item): itemsets, concatenated.
+        offsets (int32, num_itemset + 1): boundaries in packed items.
+        indices (int32, num_step x 2): subset of offsets to consider.
+        left_syn (float32, num_left_label x num_dimension): feature embeddings.
+        right_syn (float32, num_right_label x num_dimension): label embeddings.
+        tmp_syn (float32, num_dimension): internal buffer (allocated only once,
+            for performance).
+        num_negative (int32): number of negative samples.
+        learning_rate (float32): learning rate.
+
+    """
+
+    length = indices.shape[0]
+    for i in range(length):
+        j, k = indices[i]
+        do_supervised_steps(
+            items[offsets[j]:offsets[j+1]],
+            items[offsets[k]:offsets[k+1]],
+            left_syn,
+            right_syn,
             tmp_syn,
             num_negative,
             learning_rate,
