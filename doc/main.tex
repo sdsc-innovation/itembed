@@ -11,6 +11,8 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 
+\usepackage{parskip}
+
 \usepackage[
   xetex,
   unicode,
@@ -54,6 +56,7 @@
 \section{Softmax formulation}
 
 Let $(a, b)$ a pair of items, where $a \in A$ is the source and $b \in B$ the target. The actual meaning depends on the use case.
+
 % define A, B
 % example: skip gram
 
@@ -61,17 +64,17 @@ The conditional probability of observing $b$ given $a$ is defined by a softmax o
 
 % \Pr\left( A \;\middle\vert\; B \right)
 \begin{equation}
-P(b \mid a ; \mathbf{W}) = \frac{e^{\mathbf{w}_a^T \mathbf{w}_b}}{\sum_{b'} e^{\mathbf{w}_a^T \mathbf{w}_{b'}}}
+P(b \mid a ; \mathbf{u}, \mathbf{v}) = \frac{e^{\mathbf{u}_a^T \mathbf{v}_b}}{\sum_{b'} e^{\mathbf{u}_a^T \mathbf{v}_{b'}}}
 \end{equation}
 
 Negative log-likelihood:
 
 \begin{equation}
-\mathcal{L} (a, b ; W) = -\log P(b \mid a ; \mathbf{W}) = -\mathbf{w}_a^T \mathbf{w}_b + \log \sum_{b'} e^{\mathbf{w}_a^T \mathbf{w}_{b'}}
+\mathcal{L} (a, b ; \mathbf{u}, \mathbf{v}) = -\log P(b \mid a ; \mathbf{u}, \mathbf{v}) = -\mathbf{u}_a^T \mathbf{v}_b + \log \sum_{b'} e^{\mathbf{u}_a^T \mathbf{v}_{b'}}
 \end{equation}
 
 \begin{equation}
-\frac{\partial}{\partial \mathbf{w}_a} \mathcal{L} (a, b ; \mathbf{W}) = -\mathbf{w}_b + \sum_{b'} P(b' \mid a ; \mathbf{W}) \mathbf{w}_{b'}
+\frac{\partial}{\partial \mathbf{u}_a} \mathcal{L} (a, b ; \mathbf{u}, \mathbf{v}) = -\mathbf{v}_b + \sum_{b'} P(b' \mid a ; \mathbf{u}, \mathbf{v}) \mathbf{v}_{b'}
 \end{equation}
 
 
@@ -113,7 +116,7 @@ P(y = 0 \mid a, b) = 1 - P(y = 1 \mid a, b)
 However, $P(b \mid a)$ is still defined as a softmax:
 
 \begin{equation}
-P(b \mid a ; \mathbf{W}) = \frac{e^{\mathbf{w}_a^T \mathbf{w}_b}}{\sum_{b'} e^{\mathbf{w}_a^T \mathbf{w}_{b'}}}
+P(b \mid a ; \mathbf{u}, \mathbf{v}) = \frac{e^{\mathbf{u}_a^T \mathbf{v}_b}}{\sum_{b'} e^{\mathbf{u}_a^T \mathbf{v}_{b'}}}
 \end{equation}
 
 Both Mnih and Teh \cite{mnih2012fast} and Vaswani et al. \cite{vaswani-etal-2013-decoding} arbitrarily set the denominator to $1$.
@@ -123,13 +126,13 @@ Zoph et al. \cite{zoph-fast} actually report that even when trained, it stays cl
 Hence:
 
 \begin{equation}
-P(b \mid a ; \mathbf{W}) = e^{\mathbf{w}_a^T \mathbf{w}_b}
+P(b \mid a ; \mathbf{u}, \mathbf{v}) = e^{\mathbf{u}_a^T \mathbf{v}_b}
 \end{equation}
 
 The negative log-likelihood can then be computed as usual:
 
 \begin{equation}
-\mathcal{L} (a, b ; W) = -\log P (a, b ; W)
+\mathcal{L} (a, b ; \mathbf{u}, \mathbf{v}) = -\log P (a, b ; \mathbf{u}, \mathbf{v})
 \end{equation}
 
 Mnih and Teh \cite{mnih2012fast} report that using $k = 25$ is sufficient to match the performance of the regular softmax.
@@ -141,57 +144,57 @@ Negative Sampling, popularised by Mikolov et al. \cite{Mikolov2013DistributedRO}
 As defined previously, NCE is based on the following:
 
 \begin{equation}
-P(y = 1 \mid a, b ; \mathbf{W}) = \frac{e^{\mathbf{w}_a^T \mathbf{w}_b}}{e^{\mathbf{w}_a^T \mathbf{w}_b} + \vert B^* \vert Q(b)}
+P(y = 1 \mid a, b ; \mathbf{u}, \mathbf{v}) = \frac{e^{\mathbf{u}_a^T \mathbf{v}_b}}{e^{\mathbf{u}_a^T \mathbf{v}_b} + k Q(b)}
 \end{equation}
 
-Negative Sampling simplifies this computation by replacing $\vert B^* \vert Q(b)$ by $1$.
+Negative Sampling simplifies this computation by replacing $k Q(b)$ by $1$.
 Note that $\k Q(b) = 1$ is true when $B^* = B$ and $Q$ is the uniform distribution.
 
 \begin{equation}
-P(y = 1 \mid a, b ; \mathbf{W}) = \frac{e^{\mathbf{w}_a^T \mathbf{w}_b}}{e^{\mathbf{w}_a^T \mathbf{w}_b} + 1} = \sigma \left( \mathbf{w}_a^T \mathbf{w}_b \right)
+P(y = 1 \mid a, b ; \mathbf{u}, \mathbf{v}) = \frac{e^{\mathbf{u}_a^T \mathbf{v}_b}}{e^{\mathbf{u}_a^T \mathbf{v}_b} + 1} = \sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right)
 \end{equation}
 
 
 Hence:
 
 \begin{equation}
-P(a, b ; \mathbf{W}) = \sigma \left( \mathbf{w}_a^T \mathbf{w}_b \right) \prod_{b' \in B^* \subseteq B} \left( 1 - \sigma \left( \mathbf{w}_a^T \mathbf{w}_b \right) \right)
+P(a, b ; \mathbf{u}, \mathbf{v}) = \sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) \prod_{b' \in B^* \subseteq B} \left( 1 - \sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) \right)
 \end{equation}
 
 \begin{equation}
-\mathcal{L} (a, b ; \mathbf{W}) = -\log \sigma \left( \mathbf{w}_a^T \mathbf{w}_b \right) - \sum_{b' \in B^* \subseteq B} \log \left( 1 - \sigma \left( \mathbf{w}_a^T \mathbf{w}_b' \right) \right)
+\mathcal{L} (a, b ; \mathbf{u}, \mathbf{v}) = -\log \sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) - \sum_{b' \in B^* \subseteq B} \log \left( 1 - \sigma \left( \mathbf{u}_a^T \mathbf{v}_b' \right) \right)
 \end{equation}
 
-%\[ P(y \mid a, b ; \mathbf{W}) = \left( \sigma \left( \mathbf{w}_a^T \mathbf{w}_b \right) \right)^y + \left( 1 - \sigma \left( \mathbf{w}_a^T \mathbf{w}_b \right) \right)^{1 - y} \]
+%\[ P(y \mid a, b ; \mathbf{u}, \mathbf{v}) = \left( \sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) \right)^y + \left( 1 - \sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) \right)^{1 - y} \]
 
 For more details, see Goldberg and Levy's notes \cite{Goldberg2014word2vecED}.
 
 To compute the gradient, let us rewrite the loss as:
 
 \begin{equation}
-\mathcal{L} (a, b ; \mathbf{W}) = -\ell_{a, b, 1} - \sum_{b' \in B^* \subseteq B} \ell_{a, b', 0}
+\mathcal{L} (a, b ; \mathbf{u}, \mathbf{v}) = -\ell_{a, b, 1} - \sum_{b' \in B^* \subseteq B} \ell_{a, b', 0}
 \end{equation}
 
 where
 
 \begin{equation}
-\ell_{a, b, y} = \log \sigma \left( y - \mathbf{w}_a^T \mathbf{w}_b \right)
+\ell_{a, b, y} = \log \sigma \left( y - \mathbf{u}_a^T \mathbf{v}_b \right)
 \end{equation}
 
 Then:
 
 \begin{equation}
 \begin{array}{lll}
-\frac{\partial}{\partial \mathbf{w}_a} \ell (a, b, y) & = & \frac{1}{y - \sigma \left(\mathbf{w}_a^T \mathbf{w}_b \right)}
-\left( - \sigma \left(\mathbf{w}_a^T \mathbf{w}_b \right) \left( 1 - \sigma \left(\mathbf{w}_a^T \mathbf{w}_b \right) \right) \right) \mathbf{w}_b \\
-& = & \left( y - \sigma \left(\mathbf{w}_a^T \mathbf{w}_b \right) \right) \mathbf{w}_b
+\frac{\partial}{\partial \mathbf{u}_a} \ell (a, b, y) & = & \frac{1}{y - \sigma \left(\mathbf{u}_a^T \mathbf{v}_b \right)}
+\left( - \sigma \left(\mathbf{u}_a^T \mathbf{v}_b \right) \left( 1 - \sigma \left(\mathbf{u}_a^T \mathbf{v}_b \right) \right) \right) \mathbf{v}_b \\
+& = & \left( y - \sigma \left(\mathbf{u}_a^T \mathbf{v}_b \right) \right) \mathbf{v}_b
 \end{array}
 \end{equation}
 
 And similarly:
 
 \begin{equation}
-\frac{\partial}{\partial \mathbf{w}_b} \ell (a, b, y) = \left( y - \sigma \left(\mathbf{w}_a^T \mathbf{w}_b \right) \right) \mathbf{w}_a
+\frac{\partial}{\partial \mathbf{v}_b} \ell (a, b, y) = \left( y - \sigma \left(\mathbf{u}_a^T \mathbf{v}_b \right) \right) \mathbf{u}_a
 \end{equation}
 
 
@@ -212,6 +215,11 @@ P(w_i) = 1 - \sqrt{ \left( \frac{t}{f(w_i)} \right) }
 \end{equation}
 
 of being discarded, where $f(w_i)$ is its frequency and $t$ a chosen threshold, typically around $10^{-5}$.
+
+
+\section{Parallelization}
+
+Hogwild \cite{Recht2011HogwildAL}.
 
 
 \printbibliography
