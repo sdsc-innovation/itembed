@@ -9,8 +9,18 @@ from .optimization import (
 )
 
 from .util import (
+    index_batch_stream,
     pack_itemsets,
     initialize_syn,
+)
+
+from .task import (
+    Task,
+    UnsupervisedTask,
+    SupervisedTask,
+    CompoundTask,
+)
+
+from .helper import (
     train,
-    train_packed_arrays,
 )

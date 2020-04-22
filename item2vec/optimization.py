@@ -180,7 +180,7 @@ def do_supervised_steps(
     num_negative,
     learning_rate,
 ):
-    """Apply steps from a two itemsets.
+    """Apply steps from two itemsets.
 
     This is used in a supervised setting, where left-hand items are features
     and right-hand items are labels.
@@ -198,6 +198,8 @@ def do_supervised_steps(
     """
 
     # For each pair
+    # TODO maybe need to apply subsampling?
+    # TODO possibly two passes, to garantee that each item set is fully used?
     for left in left_itemset:
         for right in right_itemset:
 
@@ -266,7 +268,10 @@ def do_unsupervised_batch(
     void(
         int32[:],
         int32[:],
-        int32[:, :],
+        int32[:],
+        int32[:],
+        int32[:],
+        int32[:],
         float32[:, ::1],
         float32[:, ::1],
         float32[::1],
@@ -278,9 +283,12 @@ def do_unsupervised_batch(
     fastmath=True,
 )
 def do_supervised_batch(
-    items,
-    offsets,
-    indices,
+    left_items,
+    left_offsets,
+    left_indices,
+    right_items,
+    right_offsets,
+    right_indices,
     left_syn,
     right_syn,
     tmp_syn,
@@ -292,9 +300,12 @@ def do_supervised_batch(
     See `do_supervised_steps` for more information.
 
     Args:
-        items (int32, num_item): itemsets, concatenated.
-        offsets (int32, num_itemset + 1): boundaries in packed items.
-        indices (int32, num_step x 2): subset of offsets to consider.
+        left_items (int32, num_item): itemsets, concatenated.
+        left_offsets (int32, num_itemset + 1): boundaries in packed items.
+        left_indices (int32, num_step): subset of offsets to consider.
+        right_items (int32, num_item): itemsets, concatenated.
+        right_offsets (int32, num_itemset + 1): boundaries in packed items.
+        right_indices (int32, num_step): subset of offsets to consider.
         left_syn (float32, num_left_label x num_dimension): feature embeddings.
         right_syn (float32, num_right_label x num_dimension): label embeddings.
         tmp_syn (float32, num_dimension): internal buffer (allocated only once,
@@ -304,12 +315,13 @@ def do_supervised_batch(
 
     """
 
-    length = indices.shape[0]
+    length = left_indices.shape[0]
     for i in range(length):
-        j, k = indices[i]
+        j = left_indices[i]
+        k = right_indices[i]
         do_supervised_steps(
-            items[offsets[j]:offsets[j+1]],
-            items[offsets[k]:offsets[k+1]],
+            left_items[left_offsets[j]:left_offsets[j+1]],
+            right_items[right_offsets[k]:right_offsets[k+1]],
             left_syn,
             right_syn,
             tmp_syn,
