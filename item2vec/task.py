@@ -107,10 +107,11 @@ class SupervisedTask(Task):
 
         # Instanciate index generator
         num_itemset, = left_offsets.shape
+        assert right_offsets.shape[0] == num_itemset
         self.batch_iterator = index_batch_stream(num_itemset, batch_size)
 
     def __len__(self):
-        num_itemset, = self.offsets.shape
+        num_itemset, = self.left_offsets.shape
         return (num_itemset - 1) // self.batch_size + 1
 
     def do_batch(self, learning_rate):
@@ -118,6 +119,7 @@ class SupervisedTask(Task):
         do_supervised_batch(
             self.left_items,
             self.left_offsets,
+            indices,
             self.right_items,
             self.right_offsets,
             indices,
