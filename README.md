@@ -2,20 +2,21 @@
 # Itemset embeddings
 
 _Disclaimer: This project is named _item2vec_, is not related to the work of
-[Barkan and Koenigstein](#3) and has been developed independently, though the
-core idea is similar. Any further reference to _item2vec_ is to be associated
-to the current project._
+[Barkan and Koenigstein](#ref_item2vec) and has been developed independently,
+though the core idea is similar. Any further reference to _item2vec_ is to be
+associated to the current project._
 
 This is yet another variation of the well-known _word2vec_ method, proposed by
-[Mikolov et al.](#1), applied to unordered sequences, which commonly referred
-as itemsets. The contribution of _item2vec_ is twofold:
+[Mikolov et al.](#ref_word2vec), applied to unordered sequences, which commonly
+referred as itemsets. The contribution of _item2vec_ is twofold:
 
  1. Modifying the base algorithm to handle unordered sequences, which has an
     impact on the definition of context windows;
  2. Using the two embedding sets introduced in _word2vec_ for supervised
     learning.
 
-A similar philosophy is described by [Wu et al.](#2) in _StarSpace_.
+A similar philosophy is described by [Wu et al.](#ref_starspace) in
+_StarSpace_.
 
 More technical details are available in `./doc/main.pdf`.
 
@@ -69,11 +70,11 @@ assert (offsets == sparse.indptr).all()
 
 Training methods do not handle other data types. Also note that:
 
- * Indices start at 0;
- * Item order in an itemset is not important;
- * An itemset can contain duplicated items;
- * Itemsets order is not important;
- * There is no weight associated to items, nor itemsets.
+ * indices start at 0;
+ * item order in an itemset is not important;
+ * an itemset can contain duplicated items;
+ * itemsets order is not important;
+ * there is no weight associated to items, nor itemsets.
 
 However, a small helper is provided for simple cases:
 
@@ -89,6 +90,7 @@ itemsets = [
 ]
 
 labels, indices, offsets = pack_itemsets(itemsets, min_count=2)
+num_label = len(labels)
 ```
 
 The next step is to define at least one task. For now, let us stick to the
@@ -183,19 +185,19 @@ conda install -c numba icc_rt
 ## References
 
 <ol>
-    <li id="1">
+    <li id="ref_word2vec">
         <i>Efficient Estimation of Word Representations in Vector Space</i>,
         2013,
         Tomas Mikolov, Kai Chen, Greg Corrado, Jeffrey Dean,
         https://arxiv.org/abs/1301.3781
     </li>
-    <li id="2">
+    <li id="ref_starspace">
         <i>StarSpace: Embed All The Things!</i>,
         2017,
         Ledell Wu, Adam Fisch, Sumit Chopra, Keith Adams, Antoine Bordes, Jason Weston,
         https://arxiv.org/abs/1709.03856
     </li>
-    <li id="3">
+    <li id="ref_item2vec">
         <i>Item2Vec: Neural Item Embedding for Collaborative Filtering</i>,
         Oren Barkan, Noam Koenigstein,
         https://arxiv.org/abs/1603.04259
