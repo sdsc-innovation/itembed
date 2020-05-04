@@ -1,41 +1,174 @@
 
-# Itemset Embeddings
+# Itemset embeddings
 
-Based on [Efficient Estimation of Word Representations in Vector Space](https://arxiv.org/abs/1301.3781) (a.k.a. word2vec) by Mikolov et al., and its [official implementation](https://github.com/tmikolov/word2vec).
+_Disclaimer: This project is named _item2vec_, is not related to the work of
+[Barkan and Koenigstein](#3) and has been developed independently, though the
+core idea is similar. Any further reference to _item2vec_ is to be associated
+to the current project._
+
+This is yet another variation of the well-known _word2vec_ method, proposed by
+[Mikolov et al.](#1), applied to unordered sequences, which commonly referred
+as itemsets. The contribution of _item2vec_ is twofold:
+
+ 1. Modifying the base algorithm to handle unordered sequences, which has an
+    impact on the definition of context windows;
+ 2. Using the two embedding sets introduced in _word2vec_ for supervised
+    learning.
+
+A similar philosophy is described by [Wu et al.](#2) in _StarSpace_.
+
+More technical details are available in `./doc/main.pdf`.
+
+
+## Installation
+
+Install from source:
 
 ```
 pip install git+https://gitlab.com/jojolebarjos/item2vec.git
 ```
 
+
+## Getting started
+
+Itemsets must be provided as so-called packed arrays, i.e. a pair of integer
+arrays describing _indices_ and _offsets_. The index array is defined as the
+concatenation of all N itemsets. The offset array contains the N+1 boundaries.
+
+```python
+import numpy as np
+
+indices = np.array([
+    0, 1, 4, 7,
+    0, 1, 6,
+    2, 3, 5, 6, 7,
+], dtype=np.int32)
+
+offsets = np.array([
+    0, 4, 7, 12
+])
+```
+
+This is similar to [compressed sparse matrices](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html):
+
+```python
+from scipy.sparse import csr_matrix
+
+dense = np.array([
+    [1, 1, 0, 0, 1, 0, 0, 1],
+    [1, 1, 0, 0, 0, 0, 1, 0],
+    [0, 0, 1, 1, 0, 1, 1, 1],
+], dtype=np.int32)
+
+sparse = csr_matrix(dense)
+
+assert (indices == sparse.indices).all()
+assert (offsets == sparse.indptr).all()
+
+```
+
+Training methods do not handle other data types. Also note that:
+
+ * Indices start at 0;
+ * Item order in an itemset is not important;
+ * An itemset can contain duplicated items;
+ * Itemsets order is not important;
+ * There is no weight associated to items, nor itemsets.
+
+However, a small helper is provided for simple cases:
+
+```python
+from item2vec import pack_itemsets
+
+itemsets = [
+    ['apple', 'sugar', 'flour'],
+    ['pear', 'sugar', 'flour', 'butter'],
+    ['apple', 'pear', 'sugar', 'buffer', 'cinnamon'],
+    ['salt', 'flour', 'oil'],
+    # ...
+]
+
+labels, indices, offsets = pack_itemsets(itemsets, min_count=2)
+```
+
+The next step is to define at least one task. For now, let us stick to the
+unsupervised case, where co-occurrence is used as knowledge source. This is
+similar to the continuous bag-of-word and continuous skip-gram tasks defined
+in _word2vec_.
+
+First, two embedding sets must be allocated. Both should capture the same
+information, and one is the complement of the other. This is a not-so
+documented question of _word2vec_, but empirical results have shown that it is
+better than reusing the same set twice.
+
+```python
+from item2vec import initialize_syn
+
+num_dimension = 64
+syn0 = initialize_syn(num_label, num_dimension)
+syn1 = initialize_syn(num_label, num_dimension)
+```
+
+Second, define a task object that holds all the descriptors:
+
+```python
+from item2vec import UnsupervisedTask
+
+task = UnsupervisedTask(indices, offsets, syn0, syn1, num_negative=5)
+```
+
+Third, the `do_batch`method must be invoked multiple times, until convergence.
+Another helper is provided to handle the training loop. Note that, due to a
+different sampling strategy, a larger number of iteration is needed.
+
 ```python
 from item2vec import train
+
+train(task, num_epoch=100)
+```
+
+The full code is therefore as follows:
+
+```python
 import numpy as np
+
+from item2vec import (
+    pack_itemsets,
+    initialize_syn,
+    UnsupervisedTask,
+    train,
+)
 
 # Get your own itemsets
 itemsets = [
     ['apple', 'sugar', 'flour'],
     ['pear', 'sugar', 'flour', 'butter'],
+    ['apple', 'pear', 'sugar', 'buffer', 'cinnamon'],
+    ['salt', 'flour', 'oil'],
     # ...
 ]
 
-# Train using skip-gram
-labels, syn0, syn1 = train(itemsets, num_dimension=64, min_count=1)
+# Pack itemsets into contiguous arrays
+labels, indices, offsets = pack_itemsets(itemsets, min_count=2)
+num_label = len(labels)
 
-# Both embedding sets are usable, just choose one
+# Initialize embeddings sets from uniform distribution
+num_dimension = 64
+syn0 = initialize_syn(num_label, num_dimension)
+syn1 = initialize_syn(num_label, num_dimension)
+
+# Define unsupervised task, i.e. using co-occurrences
+task = UnsupervisedTask(indices, offsets, syn0, syn1, num_negative=5)
+
+# Do training
+# Note: due to a different sampling strategy, more epochs than word2vec are needed
+train(task, num_epoch=100)
+
+# Both embedding sets are equivalent, just choose one of them
 syn = syn0
-
-# Normalize for comparison
-n_syn = syn / np.sqrt((syn ** 2).sum(axis=1))[:, None]
-
-# Compute cosine distances to all other labels
-ref = labels.index('apple')
-distances = n_syn @ n_syn[ref]
-
-# Show closest neighbors
-print(f'#{ref} {labels[ref]}:')
-for i in np.argsort(-distances)[:10]:
-    print(f'  #{i} {labels[i]} ({distances[i]:0.4f})')
 ```
+
+More examples can be found in `./example/`.
 
 
 ## Performance improvement
@@ -47,19 +180,34 @@ conda install -c numba icc_rt
 ```
 
 
-## Relevant links
+## References
 
- * Hierarchy-related:
-    * [Joint Learning of Hierarchical Word Embeddings from a Corpus and a Taxonomy](https://openreview.net/forum?id=S1xf-W5paX)
-    * [Probabilistic Embedding of Knowledge Graphs with Box Lattice Measures](https://arxiv.org/abs/1805.06627)
-    * [Improved Representation Learning for Predicting Commonsense Ontologies](https://arxiv.org/pdf/1708.00549.pdf)
-    * [ORDER-EMBEDDINGS OF IMAGES AND LANGUAGE](https://arxiv.org/pdf/1511.06361.pdf)
-    * [HIERARCHICAL DENSITY ORDER EMBEDDINGS](https://arxiv.org/pdf/1804.09843.pdf)
-    * [Entity Hierarchy Embedding](http://www.cs.cmu.edu/~poyaoh/data/acl15entity.pdf)
+<ol>
+    <li id="1">
+        <i>Efficient Estimation of Word Representations in Vector Space</i>,
+        2013,
+        Tomas Mikolov, Kai Chen, Greg Corrado, Jeffrey Dean,
+        https://arxiv.org/abs/1301.3781
+    </li>
+    <li id="2">
+        <i>StarSpace: Embed All The Things!</i>,
+        2017,
+        Ledell Wu, Adam Fisch, Sumit Chopra, Keith Adams, Antoine Bordes, Jason Weston,
+        https://arxiv.org/abs/1709.03856
+    </li>
+    <li id="3">
+        <i>Item2Vec: Neural Item Embedding for Collaborative Filtering</i>,
+        Oren Barkan, Noam Koenigstein,
+        https://arxiv.org/abs/1603.04259
+    </li>
+</ol>
 
 
 ## Changelog
 
+ * 0.4.0 - 2020-05-04
+    * Refactor to make training task explicit
+    * Add supervised task
  * 0.3.0 - 2020-03-26
     * Complete refactor to increase performances and reusability
  * 0.2.1 - 2020-03-24

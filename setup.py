@@ -8,7 +8,7 @@ with open('README.md', 'r', encoding='utf-8') as file:
 setup(
 
     name = 'item2vec',
-    version = '0.3.0',
+    version = '0.4.0',
     packages = find_packages(),
 
     author = 'Johan Berdat',
