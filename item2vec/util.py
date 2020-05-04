@@ -28,7 +28,7 @@ def index_batch_stream(num_index, batch_size):
             i += batch_size
 
 
-def pack_itemsets(itemsets, min_count=1, min_length=2):
+def pack_itemsets(itemsets, *, min_count=1, min_length=2):
     """Convert itemset collection to packed indices.
 
     Args:
@@ -71,6 +71,49 @@ def pack_itemsets(itemsets, min_count=1, min_length=2):
     indices = np.array(indices, dtype=np.int32)
     offsets = np.array(offsets, dtype=np.int32)
     return labels, indices, offsets
+
+
+def prune_itemsets(indices, offsets, *, mask=None, min_length=None):
+    """Filter packed indices.
+
+    Either an explicit mask or a length threshold must be defined, but both
+    cannot be provided at the same time.
+
+    Args:
+        indices (int32, num_item): packed index array.
+        offsets (int32, num_itemset + 1): itemsets offsets in packed array.
+        mask (bool, num_itemset): boolean mask.
+        min_length (int): minimum length, inclusive.
+
+    Returns:
+        indices (int32, num_item): packed index array.
+        offsets (int32, num_itemset + 1): itemsets offsets in packed array.
+
+    """
+
+    # Build mask from length limit, if needed
+    lengths = offsets[1:] - offsets[:-1]
+    if min_length is not None:
+        assert mask is None
+        mask = lengths >= min_length
+    assert lengths.shape == mask.shape
+
+    # Allocate buffers
+    filtered_indices = np.zeros(lengths[mask].sum(), dtype=np.int32)
+    filtered_offsets = np.zeros(mask.sum() + 1, dtype=np.int32)
+
+    # Build new itemsets
+    offset = 0
+    j = 0
+    for i in range(len(mask)):
+        keep = mask[i]
+        if keep:
+            length = lengths[i]
+            filtered_indices[offset:offset+length] = indices[offsets[i]:offsets[i+1]]
+            offset += length
+            filtered_offsets[j] = offset
+            j += 1
+    return filtered_indices, filtered_offsets
 
 
 def initialize_syn(num_label, num_dimension, method='uniform'):

@@ -11,6 +11,7 @@ from .optimization import (
 from .util import (
     index_batch_stream,
     pack_itemsets,
+    prune_itemsets,
     initialize_syn,
 )
 
