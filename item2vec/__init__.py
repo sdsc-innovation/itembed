@@ -14,6 +14,7 @@ from .util import (
     prune_itemsets,
     initialize_syn,
     train,
+    softmax,
 )
 
 from .task import (

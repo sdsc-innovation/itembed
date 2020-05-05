@@ -186,3 +186,10 @@ def train(
     # Allow soft interruption
     except KeyboardInterrupt:
         pass
+
+
+def softmax(x):
+    """Compute softmax."""
+
+    e = np.exp(x)
+    return e / e.sum(axis=-1)[..., None]
