@@ -3,6 +3,8 @@ from collections import Counter
 
 import numpy as np
 
+from tqdm import tqdm
+
 
 def index_batch_stream(num_index, batch_size):
     """Indices generator."""
@@ -137,3 +139,50 @@ def initialize_syn(num_label, num_dimension, method='uniform'):
     else:
         raise KeyError(method)
     return syn
+
+
+def train(
+    task,
+    *,
+    num_epoch=10,
+    initial_learning_rate=0.025,
+):
+    """Train loop.
+
+    Learning rate decreases linearly, down to zero.
+
+    Keyboard interruption are silently captured, which interrupt the training
+    process.
+
+    A progress bar is shown, using `tqdm`.
+
+    Args:
+        task (Task): top-level task to train.
+        num_epoch (int): number of passes across the whole task (default: 10).
+        initial_learning_rate (float): maximum learning rate (default: 0.025).
+
+    """
+
+    try:
+
+        # Iterate over epochs and batches
+        num_batch = len(task)
+        num_step = num_epoch * num_batch
+        step = 0
+        with tqdm(total=num_step) as progress:
+            for epoch in range(num_epoch):
+                for batch in range(num_batch):
+
+                    # Learning rate decreases linearly
+                    learning_rate = (1 - step / num_step) * initial_learning_rate
+
+                    # Apply step
+                    task.do_batch(learning_rate)
+
+                    # Update progress
+                    step += 1
+                    progress.update(1)
+
+    # Allow soft interruption
+    except KeyboardInterrupt:
+        pass

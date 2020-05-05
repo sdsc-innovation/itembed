@@ -13,6 +13,7 @@ from .util import (
     pack_itemsets,
     prune_itemsets,
     initialize_syn,
+    train,
 )
 
 from .task import (
@@ -20,8 +21,4 @@ from .task import (
     UnsupervisedTask,
     SupervisedTask,
     CompoundTask,
-)
-
-from .helper import (
-    train,
 )
