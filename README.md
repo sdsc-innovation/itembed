@@ -23,7 +23,13 @@ More technical details are available in `./doc/main.pdf`.
 
 ## Installation
 
-Install from source:
+Install from [PyPI](https://pypi.org/project/item2vec/):
+
+```
+pip install item2vec
+```
+
+Or install from source, to ensure latest version:
 
 ```
 pip install git+https://gitlab.com/jojolebarjos/item2vec.git
