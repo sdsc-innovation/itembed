@@ -13,8 +13,6 @@ referred as itemsets. The contribution of _itembed_ is twofold:
 A similar philosophy is described by [Wu et al.](#ref_starspace) in
 _StarSpace_ and by [Barkan and Koenigstein](#ref_item2vec) in _item2vec_.
 
-More technical details are available in `./doc/main.pdf`.
-
 
 ## Installation
 
