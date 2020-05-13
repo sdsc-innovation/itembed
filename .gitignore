@@ -3,4 +3,4 @@
 *.ipynb_checkpoints
 /build
 /dist
-/item2vec.egg-info
+/itembed.egg-info

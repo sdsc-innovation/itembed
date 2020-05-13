@@ -1,14 +1,9 @@
 
 # Itemset embeddings
 
-_Disclaimer: This project is named _item2vec_, is not related to the work of
-[Barkan and Koenigstein](#ref_item2vec) and has been developed independently,
-though the core idea is similar. Any further reference to _item2vec_ is to be
-associated to the current project._
-
 This is yet another variation of the well-known _word2vec_ method, proposed by
 [Mikolov et al.](#ref_word2vec), applied to unordered sequences, which commonly
-referred as itemsets. The contribution of _item2vec_ is twofold:
+referred as itemsets. The contribution of _itembed_ is twofold:
 
  1. Modifying the base algorithm to handle unordered sequences, which has an
     impact on the definition of context windows;
@@ -16,23 +11,23 @@ referred as itemsets. The contribution of _item2vec_ is twofold:
     learning.
 
 A similar philosophy is described by [Wu et al.](#ref_starspace) in
-_StarSpace_.
+_StarSpace_ and by [Barkan and Koenigstein](#ref_item2vec) in _item2vec_.
 
 More technical details are available in `./doc/main.pdf`.
 
 
 ## Installation
 
-Install from [PyPI](https://pypi.org/project/item2vec/):
+Install from [PyPI](https://pypi.org/project/itembed/):
 
 ```
-pip install item2vec
+pip install itembed
 ```
 
 Or install from source, to ensure latest version:
 
 ```
-pip install git+https://gitlab.com/jojolebarjos/item2vec.git
+pip install git+https://gitlab.com/jojolebarjos/itembed.git
 ```
 
 
@@ -85,7 +80,7 @@ Training methods do not handle other data types. Also note that:
 However, a small helper is provided for simple cases:
 
 ```python
-from item2vec import pack_itemsets
+from itembed import pack_itemsets
 
 itemsets = [
     ['apple', 'sugar', 'flour'],
@@ -110,7 +105,7 @@ documented question of _word2vec_, but empirical results have shown that it is
 better than reusing the same set twice.
 
 ```python
-from item2vec import initialize_syn
+from itembed import initialize_syn
 
 num_dimension = 64
 syn0 = initialize_syn(num_label, num_dimension)
@@ -120,7 +115,7 @@ syn1 = initialize_syn(num_label, num_dimension)
 Second, define a task object that holds all the descriptors:
 
 ```python
-from item2vec import UnsupervisedTask
+from itembed import UnsupervisedTask
 
 task = UnsupervisedTask(indices, offsets, syn0, syn1, num_negative=5)
 ```
@@ -130,7 +125,7 @@ Another helper is provided to handle the training loop. Note that, due to a
 different sampling strategy, a larger number of iteration is needed.
 
 ```python
-from item2vec import train
+from itembed import train
 
 train(task, num_epoch=100)
 ```
@@ -140,7 +135,7 @@ The full code is therefore as follows:
 ```python
 import numpy as np
 
-from item2vec import (
+from itembed import (
     pack_itemsets,
     initialize_syn,
     UnsupervisedTask,

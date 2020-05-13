@@ -7,15 +7,15 @@ with open('README.md', 'r', encoding='utf-8') as file:
 
 setup(
 
-    name = 'item2vec',
-    version = '0.4.0',
+    name = 'itembed',
+    version = '0.5.0',
     packages = find_packages(),
 
     author = 'Johan Berdat',
     author_email = 'jojolebarjos@gmail.com',
     license = 'MIT',
 
-    url = 'https://gitlab.com/jojolebarjos/item2vec',
+    url = 'https://gitlab.com/jojolebarjos/itembed',
 
     description = 'word2vec for itemsets',
     long_description = long_description,
