@@ -2,8 +2,8 @@
 # Itemset embeddings
 
 This is yet another variation of the well-known _word2vec_ method, proposed by
-[Mikolov et al.](#ref_word2vec), applied to unordered sequences, which commonly
-referred as itemsets. The contribution of _itembed_ is twofold:
+[Mikolov et al.](#ref_word2vec), applied to unordered sequences, which are
+commonly referred as itemsets. The contribution of _itembed_ is twofold:
 
  1. Modifying the base algorithm to handle unordered sequences, which has an
     impact on the definition of context windows;
@@ -12,6 +12,7 @@ referred as itemsets. The contribution of _itembed_ is twofold:
 
 A similar philosophy is described by [Wu et al.](#ref_starspace) in
 _StarSpace_ and by [Barkan and Koenigstein](#ref_item2vec) in _item2vec_.
+_itembed_ uses [Numba](#ref_numba) to achieve high performances.
 
 
 ## Installation
@@ -198,14 +199,23 @@ conda install -c numba icc_rt
     </li>
     <li id="ref_item2vec">
         <i>Item2Vec: Neural Item Embedding for Collaborative Filtering</i>,
+        2016,
         Oren Barkan, Noam Koenigstein,
         https://arxiv.org/abs/1603.04259
+    </li>
+    <li id="ref_numba">
+        <i>Numba: a LLVM-based Python JIT compiler</i>,
+        2015,
+        Siu Kwan Lam, Antoine Pitrou, Stanley Seibert,
+        https://doi.org/10.1145/2833157.2833162
     </li>
 </ol>
 
 
 ## Changelog
 
+ * 0.4.1 - 2020-05-13
+    * Clean and rename, to avoid confusion
  * 0.4.0 - 2020-05-04
     * Refactor to make training task explicit
     * Add supervised task
