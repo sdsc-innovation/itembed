@@ -15,6 +15,8 @@ from .util import (
     initialize_syn,
     train,
     softmax,
+    norm,
+    normalize,
 )
 
 from .task import (

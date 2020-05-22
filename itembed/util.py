@@ -193,3 +193,15 @@ def softmax(x):
 
     e = np.exp(x)
     return e / e.sum(axis=-1)[..., None]
+
+
+def norm(x):
+    """L2 norm."""
+
+    return np.sqrt((x ** 2).sum(axis=-1))
+
+
+def normalize(x):
+    """L2 normalization."""
+
+    return x / norm(x)[..., None]
