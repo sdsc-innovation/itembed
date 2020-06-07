@@ -16,6 +16,9 @@ setup(
     license = 'MIT',
 
     url = 'https://gitlab.com/jojolebarjos/itembed',
+    project_urls={
+        'Tracker': 'https://gitlab.com/jojolebarjos/itembed/-/issues',
+    },
 
     description = 'word2vec for itemsets',
     long_description = long_description,
@@ -46,10 +49,11 @@ setup(
         'Topic :: Utilities',
     ],
 
+    python_requires = '>=3.6',
     install_requires = [
-        'numba',
-        'numpy',
-        'tqdm',
-    ]
+        'numba>=0.34',
+        'scipy>=0.16',
+        'tqdm>=1.0',
+    ],
 
 )
