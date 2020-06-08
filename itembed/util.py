@@ -106,7 +106,7 @@ def prune_itemsets(indices, offsets, *, mask=None, min_length=None):
 
     # Build new itemsets
     offset = 0
-    j = 0
+    j = 1
     for i in range(len(mask)):
         keep = mask[i]
         if keep:
