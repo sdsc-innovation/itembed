@@ -44,15 +44,22 @@ def do_step(
 ):
     """Apply a single training step.
 
-    Args:
-        left (int32): left-hand item.
-        right (int32): right-hand item.
-        syn_left (float32, num_left x num_dimension): left-hand embeddings.
-        syn_right (float32, num_right x num_dimension): right-hand embeddings.
-        tmp_syn (float32, num_dimension): internal buffer (allocated only once,
-            for performance).
-        num_negative (int32): number of negative samples.
-        learning_rate (int32): learning rate.
+    Parameters
+    ----------
+    left: int32
+        Left-hand item.
+    right: int32
+        Right-hand item.
+    syn_left: float32, num_left x num_dimension
+        Left-hand embeddings.
+    syn_right: float32, num_right x num_dimension
+        Right-hand embeddings.
+    tmp_syn: float32, num_dimension
+        Internal buffer (allocated only once, for performance).
+    num_negative: int32
+        Number of negative samples.
+    learning_rate: int32
+        Learning rate.
 
     """
 
@@ -125,14 +132,20 @@ def do_unsupervised_steps(
 
     Itemset must have at least 2 items. Length is not checked, for efficiency.
 
-    Args:
-        itemset (int32, length): items.
-        syn0 (float32, num_label x num_dimension): first set of embeddings.
-        syn1 (float32, num_label x num_dimension): second set of embeddings.
-        tmp_syn (float32, num_dimension): internal buffer (allocated only once,
-            for performance).
-        num_negative (int32): number of negative samples.
-        learning_rate (float32): learning rate.
+    Parameters
+    ----------
+    itemset: int32, length
+        Items.
+    syn0: float32, num_label x num_dimension
+        First set of embeddings.
+    syn1: float32, num_label x num_dimension
+        Second set of embeddings.
+    tmp_syn: float32, num_dimension
+        Internal buffer (allocated only once, for performance).
+    num_negative: int32
+        Number of negative samples.
+    learning_rate: float32
+        Learning rate.
 
     """
 
@@ -185,15 +198,22 @@ def do_supervised_steps(
     This is used in a supervised setting, where left-hand items are features
     and right-hand items are labels.
 
-    Args:
-        left_itemset (int32, left_length): feature items.
-        right_itemset (int32, right_length): label items.
-        left_syn (float32, num_left_label x num_dimension): feature embeddings.
-        right_syn (float32, num_right_label x num_dimension): label embeddings.
-        tmp_syn (float32, num_dimension): internal buffer (allocated only once,
-            for performance).
-        num_negative (int32): number of negative samples.
-        learning_rate (float32): learning rate.
+    Parameters
+    ----------
+    left_itemset: int32, left_length
+        Feature items.
+    right_itemset: int32, right_length
+        Label items.
+    left_syn: float32, num_left_label x num_dimension
+        Feature embeddings.
+    right_syn: float32, num_right_label x num_dimension
+        Label embeddings.
+    tmp_syn: float32, num_dimension
+        Internal buffer (allocated only once, for performance).
+    num_negative: int32
+        Number of negative samples.
+    learning_rate: float32
+        Learning rate.
 
     """
 
@@ -238,18 +258,28 @@ def do_unsupervised_batch(
 ):
     """Apply unsupervised steps from multiple itemsets.
 
-    See `do_unsupervised_steps` for more information.
+    See Also
+    --------
+    :meth:`do_unsupervised_steps`
 
-    Args:
-        items (int32, num_item): itemsets, concatenated.
-        offsets (int32, num_itemset + 1): boundaries in packed items.
-        indices (int32, num_step): subset of offsets to consider.
-        syn0 (float32, num_label x num_dimension): first set of embeddings.
-        syn1 (float32, num_label x num_dimension): second set of embeddings.
-        tmp_syn (float32, num_dimension): internal buffer (allocated only once,
-            for performance).
-        num_negative (int32): number of negative samples.
-        learning_rate (float32): learning rate.
+    Parameters
+    ----------
+    items: int32, num_item
+        Itemsets, concatenated.
+    offsets: int32, num_itemset + 1
+        Boundaries in packed items.
+    indices: int32, num_step
+        Subset of offsets to consider.
+    syn0: float32, num_label x num_dimension
+        First set of embeddings.
+    syn1: float32, num_label x num_dimension
+        Second set of embeddings.
+    tmp_syn: float32, num_dimension
+        Internal buffer (allocated only once, for performance).
+    num_negative: int32
+        Number of negative samples.
+    learning_rate: float32
+        Learning rate.
 
     """
 
@@ -297,21 +327,34 @@ def do_supervised_batch(
 ):
     """Apply supervised steps from multiple itemsets.
 
-    See `do_supervised_steps` for more information.
+    See Also
+    --------
+    :meth:`do_supervised_steps`
 
-    Args:
-        left_items (int32, num_item): itemsets, concatenated.
-        left_offsets (int32, num_itemset + 1): boundaries in packed items.
-        left_indices (int32, num_step): subset of offsets to consider.
-        right_items (int32, num_item): itemsets, concatenated.
-        right_offsets (int32, num_itemset + 1): boundaries in packed items.
-        right_indices (int32, num_step): subset of offsets to consider.
-        left_syn (float32, num_left_label x num_dimension): feature embeddings.
-        right_syn (float32, num_right_label x num_dimension): label embeddings.
-        tmp_syn (float32, num_dimension): internal buffer (allocated only once,
-            for performance).
-        num_negative (int32): number of negative samples.
-        learning_rate (float32): learning rate.
+    Parameters
+    ----------
+    left_items: int32, num_item
+        Itemsets, concatenated.
+    left_offsets: int32, num_itemset + 1
+        Boundaries in packed items.
+    left_indices: int32, num_step
+        Subset of offsets to consider.
+    right_items: int32, num_item
+        Itemsets, concatenated.
+    right_offsets: int32, num_itemset + 1
+        Boundaries in packed items.
+    right_indices: int32, num_step
+        Subset of offsets to consider.
+    left_syn: float32, num_left_label x num_dimension
+        Feature embeddings.
+    right_syn: float32, num_right_label x num_dimension
+        Label embeddings.
+    tmp_syn: float32, num_dimension
+        Internal buffer (allocated only once, for performance).
+    num_negative: int32
+        Number of negative samples.
+    learning_rate: float32
+        Learning rate.
 
     """
 

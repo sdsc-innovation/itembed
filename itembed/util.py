@@ -33,15 +33,23 @@ def index_batch_stream(num_index, batch_size):
 def pack_itemsets(itemsets, *, min_count=1, min_length=2):
     """Convert itemset collection to packed indices.
 
-    Args:
-        itemsets (list of list of object): list of sets of hashable objects.
-        min_count (int): minimal frequency count to be kept (default: 1).
-        min_length (int): minimal itemset length (default: 2).
+    Parameters
+    ----------
+    itemsets: list of list of object
+        List of sets of hashable objects.
+    min_count: int, optional
+        Minimal frequency count to be kept.
+    min_length: int, optional
+        Minimal itemset length.
 
-    Returns:
-        labels (list of object): mapping from indices to labels.
-        indices (int32, num_item): packed index array.
-        offsets (int32, num_itemset + 1): itemsets offsets in packed array.
+    Returns
+    -------
+    labels: list of object
+        Mapping from indices to labels.
+    indices: int32, num_item
+        Packed index array.
+    offsets: int32, num_itemset + 1
+        Itemsets offsets in packed array.
 
     """
 
@@ -81,15 +89,23 @@ def prune_itemsets(indices, offsets, *, mask=None, min_length=None):
     Either an explicit mask or a length threshold must be defined, but both
     cannot be provided at the same time.
 
-    Args:
-        indices (int32, num_item): packed index array.
-        offsets (int32, num_itemset + 1): itemsets offsets in packed array.
-        mask (bool, num_itemset): boolean mask.
-        min_length (int): minimum length, inclusive.
+    Parameters
+    ----------
+    indices: int32, num_item
+        Packed index array.
+    offsets: int32, num_itemset + 1
+        Itemsets offsets in packed array.
+    mask: bool, num_itemset
+        Boolean mask.
+    min_length: int
+        Minimum length, inclusive.
 
-    Returns:
-        indices (int32, num_item): packed index array.
-        offsets (int32, num_itemset + 1): itemsets offsets in packed array.
+    Returns
+    -------
+    indices: int32, num_item
+        Packed index array.
+    offsets: int32, num_itemset + 1
+        Itemsets offsets in packed array.
 
     """
 
@@ -121,12 +137,19 @@ def prune_itemsets(indices, offsets, *, mask=None, min_length=None):
 def initialize_syn(num_label, num_dimension, method='uniform'):
     """Allocate and initialize embedding set.
 
-    Args:
-        num_label (int32): number of labels.
-        num_dimension (int32): size of embeddings.
+    Parameters
+    ----------
+    num_label: int32
+        Number of labels.
+    num_dimension: int32
+        Size of embeddings.
+    method: {"uniform", "zero"}, optional
+        Initialization method.
 
-    Returns:
-        syn (float32, num_label x num_dimension): embedding set.
+    Returns
+    -------
+    syn: float32, num_label x num_dimension
+        Embedding set.
 
     """
 
@@ -154,12 +177,16 @@ def train(
     Keyboard interruption are silently captured, which interrupt the training
     process.
 
-    A progress bar is shown, using `tqdm`.
+    A progress bar is shown, using ``tqdm``.
 
-    Args:
-        task (Task): top-level task to train.
-        num_epoch (int): number of passes across the whole task (default: 10).
-        initial_learning_rate (float): maximum learning rate (default: 0.025).
+    Parameters
+    ----------
+    task: Task
+        Top-level task to train.
+    num_epoch: int
+        Number of passes across the whole task.
+    initial_learning_rate: float
+        Maximum learning rate.
 
     """
 

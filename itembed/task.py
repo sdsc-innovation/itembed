@@ -18,7 +18,9 @@ class Task:
 class UnsupervisedTask(Task):
     """Unsupervised training task.
 
-    See `do_unsupervised_steps` for more information.
+    See Also
+    --------
+    :meth:`do_unsupervised_steps`
 
     """
 
@@ -72,7 +74,9 @@ class UnsupervisedTask(Task):
 class SupervisedTask(Task):
     """Supervised training task.
 
-    See `do_supervised_steps` for more information.
+    See Also
+    --------
+    :meth:`do_supervised_steps`
 
     """
 
