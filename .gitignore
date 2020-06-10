@@ -1,6 +1,7 @@
 *.pkl
 *.pyc
 *.ipynb_checkpoints
+/docs/build
 /build
 /dist
 /itembed.egg-info

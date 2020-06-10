@@ -134,7 +134,7 @@ def prune_itemsets(indices, offsets, *, mask=None, min_length=None):
     return filtered_indices, filtered_offsets
 
 
-def initialize_syn(num_label, num_dimension, method='uniform'):
+def initialize_syn(num_label, num_dimension, method="uniform"):
     """Allocate and initialize embedding set.
 
     Parameters
@@ -153,9 +153,9 @@ def initialize_syn(num_label, num_dimension, method='uniform'):
 
     """
 
-    if method == 'zero':
+    if method == "zero":
         syn = np.zeros((num_label, num_dimension), dtype=np.float32)
-    elif method == 'uniform':
+    elif method == "uniform":
         syn = np.random.rand(num_label, num_dimension).astype(np.float32)
         syn -= 0.5
         syn /= num_dimension
@@ -223,12 +223,12 @@ def softmax(x):
 
 
 def norm(x):
-    """L2 norm."""
+    """L\ :sub:`2` norm."""
 
     return np.sqrt((x ** 2).sum(axis=-1))
 
 
 def normalize(x):
-    """L2 normalization."""
+    """L\ :sub:`2` normalization."""
 
     return x / norm(x)[..., None]

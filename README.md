@@ -119,7 +119,7 @@ from itembed import UnsupervisedTask
 task = UnsupervisedTask(indices, offsets, syn0, syn1, num_negative=5)
 ```
 
-Third, the `do_batch`method must be invoked multiple times, until convergence.
+Third, the `do_batch` method must be invoked multiple times, until convergence.
 Another helper is provided to handle the training loop. Note that, due to a
 different sampling strategy, a larger number of iteration is needed.
 
@@ -170,7 +170,9 @@ train(task, num_epoch=100)
 syn = syn0
 ```
 
-More examples can be found in `./example/`.
+More examples can be found in `./example/`. See the
+[documentation](https://itembed.readthedocs.io/en/stable/) for more detailed
+information.
 
 
 ## Performance improvement
@@ -214,6 +216,8 @@ conda install -c numba icc_rt
 
 ## Changelog
 
+ * 0.4.2 - ...
+    * Clean documentation and examples
  * 0.4.1 - 2020-05-13
     * Clean and rename, to avoid confusion
  * 0.4.0 - 2020-05-04
