@@ -184,6 +184,21 @@ conda install -c numba icc_rt
 ```
 
 
+## Citation
+
+If you use this software in your work, it would be appreciated if you would cite this tool, for instance using the following Bibtex reference:
+
+```bibtex
+@software{itembed,
+  author = {Johan Berdat},
+  title = {itembed},
+  url = {https://gitlab.com/jojolebarjos/itembed},
+  version = {0.4.2},
+  date = {2020-06-10},
+}
+```
+
+
 ## References
 
 <ol>
@@ -216,8 +231,9 @@ conda install -c numba icc_rt
 
 ## Changelog
 
- * 0.4.2 - ...
+ * 0.4.2 - 2020-06-10
     * Clean documentation and examples
+    * Bug fixes
  * 0.4.1 - 2020-05-13
     * Clean and rename, to avoid confusion
  * 0.4.0 - 2020-05-04
