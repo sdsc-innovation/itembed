@@ -30,14 +30,22 @@ class UnsupervisedTask(Task):
         syn0,
         syn1,
         *,
+        weights=None,
         num_negative=5,
         learning_rate_scale=1.0,
         batch_size=64,
     ):
         super().__init__(learning_rate_scale)
 
+        # Allocate unit weights, if needed
+        if weights is None:
+            weights = np.ones(items.shape[0], dtype=np.float32)
+        else:
+            assert weights.shape == items.shape
+
         # Store parameters
         self.items = items
+        self.weights = weights
         self.offsets = offsets
         self.syn0 = syn0
         self.syn1 = syn1
@@ -61,6 +69,7 @@ class UnsupervisedTask(Task):
         indices = next(self.batch_iterator)
         do_unsupervised_batch(
             self.items,
+            self.weights,
             self.offsets,
             indices,
             self.syn0,
@@ -88,17 +97,31 @@ class SupervisedTask(Task):
         left_syn,
         right_syn,
         *,
+        left_weights=None,
+        right_weights=None,
         num_negative=5,
         learning_rate_scale=1.0,
         batch_size=64,
     ):
         super().__init__(learning_rate_scale)
 
+        # Allocate unit weights, if needed
+        if left_weights is None:
+            left_weights = np.ones(left_items.shape[0], dtype=np.float32)
+        else:
+            assert left_weights.shape == left_items.shape
+        if right_weights is None:
+            right_weights = np.ones(right_items.shape[0], dtype=np.float32)
+        else:
+            assert right_weights.shape == right_items.shape
+
         # Store parameters
         self.left_items = left_items
         self.left_offsets = left_offsets
+        self.left_weights = left_weights
         self.right_items = right_items
         self.right_offsets = right_offsets
+        self.right_weights = right_weights
         self.left_syn = left_syn
         self.right_syn = right_syn
         self.num_negative = num_negative
@@ -122,9 +145,11 @@ class SupervisedTask(Task):
         indices = next(self.batch_iterator)
         do_supervised_batch(
             self.left_items,
+            self.left_weights,
             self.left_offsets,
             indices,
             self.right_items,
+            self.right_weights,
             self.right_offsets,
             indices,
             self.left_syn,

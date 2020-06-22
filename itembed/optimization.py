@@ -101,6 +101,7 @@ def do_step(
 @jit(
     void(
         int32[:],
+        float32[:],
         float32[:, ::1],
         float32[:, ::1],
         float32[::1],
@@ -113,6 +114,7 @@ def do_step(
 )
 def do_unsupervised_steps(
     itemset,
+    weights,
     syn0,
     syn1,
     tmp_syn,
@@ -136,6 +138,8 @@ def do_unsupervised_steps(
     ----------
     itemset: int32, length
         Items.
+    weights: float32, length
+        Item weights.
     syn0: float32, num_label x num_dimension
         First set of embeddings.
     syn1: float32, num_label x num_dimension
@@ -153,20 +157,19 @@ def do_unsupervised_steps(
     length = itemset.shape[0]
 
     # Enumerate words
-    for j in range(length):
-        left = itemset[j]
+    for i in range(length):
 
         # Choose a single random neighbor
-        k = random.randint(0, length - 2)
-        if k >= j:
-            k += 1
-        right = itemset[k]
+        j = random.randint(0, length - 2)
+        if j >= i:
+            j += 1
 
         # Apply update
         do_step(
-            left, right,
+            itemset[i], itemset[j],
             syn0, syn1, tmp_syn,
-            num_negative, learning_rate
+            num_negative,
+            learning_rate * weights[i] * weights[j],
         )
 
 
@@ -174,6 +177,8 @@ def do_unsupervised_steps(
     void(
         int32[:],
         int32[:],
+        float32[:],
+        float32[:],
         float32[:, ::1],
         float32[:, ::1],
         float32[::1],
@@ -187,6 +192,8 @@ def do_unsupervised_steps(
 def do_supervised_steps(
     left_itemset,
     right_itemset,
+    left_weights,
+    right_weights,
     left_syn,
     right_syn,
     tmp_syn,
@@ -204,6 +211,10 @@ def do_supervised_steps(
         Feature items.
     right_itemset: int32, right_length
         Label items.
+    left_weights: float32, left_length
+        Feature item weights.
+    right_weights: float32, right_length
+        Label item weights.
     left_syn: float32, num_left_label x num_dimension
         Feature embeddings.
     right_syn: float32, num_right_label x num_dimension
@@ -220,20 +231,22 @@ def do_supervised_steps(
     # For each pair
     # TODO maybe need to apply subsampling?
     # TODO possibly two passes, to garantee that each item set is fully used?
-    for left in left_itemset:
-        for right in right_itemset:
+    for i in range(len(left_itemset)):
+        for j in range(len(right_itemset)):
 
             # Apply update
             do_step(
-                left, right,
+                left_itemset[i], right_itemset[j],
                 left_syn, right_syn, tmp_syn,
-                num_negative, learning_rate
+                num_negative,
+                learning_rate * left_weights[i] * right_itemset[j],
             )
 
 
 @jit(
     void(
         int32[:],
+        float32[:],
         int32[:],
         int32[:],
         float32[:, ::1],
@@ -248,6 +261,7 @@ def do_supervised_steps(
 )
 def do_unsupervised_batch(
     items,
+    weights,
     offsets,
     indices,
     syn0,
@@ -266,6 +280,8 @@ def do_unsupervised_batch(
     ----------
     items: int32, num_item
         Itemsets, concatenated.
+    weights: float32, num_item
+        Item weights, concatenated.
     offsets: int32, num_itemset + 1
         Boundaries in packed items.
     indices: int32, num_step
@@ -286,6 +302,7 @@ def do_unsupervised_batch(
     for i in indices:
         do_unsupervised_steps(
             items[offsets[i]:offsets[i+1]],
+            weights[offsets[i]:offsets[i+1]],
             syn0,
             syn1,
             tmp_syn,
@@ -297,9 +314,11 @@ def do_unsupervised_batch(
 @jit(
     void(
         int32[:],
+        float32[:],
         int32[:],
         int32[:],
         int32[:],
+        float32[:],
         int32[:],
         int32[:],
         float32[:, ::1],
@@ -314,9 +333,11 @@ def do_unsupervised_batch(
 )
 def do_supervised_batch(
     left_items,
+    left_weights,
     left_offsets,
     left_indices,
     right_items,
+    right_weights,
     right_offsets,
     right_indices,
     left_syn,
@@ -333,14 +354,18 @@ def do_supervised_batch(
 
     Parameters
     ----------
-    left_items: int32, num_item
+    left_items: int32, num_left_item
         Itemsets, concatenated.
+    left_weights: float32, num_left_item
+        Item weights, concatenated.
     left_offsets: int32, num_itemset + 1
         Boundaries in packed items.
     left_indices: int32, num_step
         Subset of offsets to consider.
-    right_items: int32, num_item
+    right_items: int32, num_right_item
         Itemsets, concatenated.
+    right_weights: float32, num_right_item
+        Item weights, concatenated.
     right_offsets: int32, num_itemset + 1
         Boundaries in packed items.
     right_indices: int32, num_step
@@ -365,6 +390,8 @@ def do_supervised_batch(
         do_supervised_steps(
             left_items[left_offsets[j]:left_offsets[j+1]],
             right_items[right_offsets[k]:right_offsets[k+1]],
+            left_weights[left_offsets[j]:left_offsets[j+1]],
+            right_weights[right_offsets[k]:right_offsets[k+1]],
             left_syn,
             right_syn,
             tmp_syn,
