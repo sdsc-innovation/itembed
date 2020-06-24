@@ -58,7 +58,7 @@ def do_step(
         Internal buffer (allocated only once, for performance).
     num_negative: int32
         Number of negative samples.
-    learning_rate: int32
+    learning_rate: float32
         Learning rate.
 
     """
@@ -239,7 +239,7 @@ def do_supervised_steps(
                 left_itemset[i], right_itemset[j],
                 left_syn, right_syn, tmp_syn,
                 num_negative,
-                learning_rate * left_weights[i] * right_itemset[j],
+                learning_rate * left_weights[i] * right_weights[j],
             )
 
 
