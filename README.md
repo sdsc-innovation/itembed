@@ -202,29 +202,29 @@ If you use this software in your work, it would be appreciated if you would cite
 ## References
 
 <ol>
-    <li id="ref_word2vec">
+    <li><a name="ref_word2vec"></a>
         <i>Efficient Estimation of Word Representations in Vector Space</i>,
         2013,
         Tomas Mikolov, Kai Chen, Greg Corrado, Jeffrey Dean,
-        https://arxiv.org/abs/1301.3781
+        <https://arxiv.org/abs/1301.3781>
     </li>
-    <li id="ref_starspace">
+    <li><a name="ref_starspace"></a>
         <i>StarSpace: Embed All The Things!</i>,
         2017,
         Ledell Wu, Adam Fisch, Sumit Chopra, Keith Adams, Antoine Bordes, Jason Weston,
-        https://arxiv.org/abs/1709.03856
+        <https://arxiv.org/abs/1709.03856>
     </li>
-    <li id="ref_item2vec">
+    <li><a name="ref_item2vec"></a>
         <i>Item2Vec: Neural Item Embedding for Collaborative Filtering</i>,
         2016,
         Oren Barkan, Noam Koenigstein,
-        https://arxiv.org/abs/1603.04259
+        <https://arxiv.org/abs/1603.04259>
     </li>
-    <li id="ref_numba">
+    <li><a name="ref_numba"></a>
         <i>Numba: a LLVM-based Python JIT compiler</i>,
         2015,
         Siu Kwan Lam, Antoine Pitrou, Stanley Seibert,
-        https://doi.org/10.1145/2833157.2833162
+        <https://doi.org/10.1145/2833157.2833162>
     </li>
 </ol>
 

@@ -12,6 +12,8 @@ class Task:
         self.learning_rate_scale = learning_rate_scale
 
     def do_batch(self, learning_rate):
+        """Apply training step."""
+
         raise NotImplementedError()
 
 
@@ -21,6 +23,27 @@ class UnsupervisedTask(Task):
     See Also
     --------
     :meth:`do_unsupervised_steps`
+
+    Parameters
+    ----------
+    items: int32, num_item
+        Itemsets, concatenated.
+    offsets: int32, num_itemset + 1
+        Boundaries in packed items.
+    indices: int32, num_step
+        Subset of offsets to consider.
+    syn0: float32, num_label x num_dimension
+        First set of embeddings.
+    syn1: float32, num_label x num_dimension
+        Second set of embeddings.
+    weights: float32, num_item, optional
+        Item weights, concatenated.
+    num_negative: int32, optional
+        Number of negative samples.
+    learning_rate_scale: float32, optional
+        Learning rate multiplier.
+    batch_size: int32, optional
+        Batch size.
 
     """
 
@@ -86,6 +109,31 @@ class SupervisedTask(Task):
     See Also
     --------
     :meth:`do_supervised_steps`
+
+    Parameters
+    ----------
+    left_items: int32, num_left_item
+        Itemsets, concatenated.
+    left_offsets: int32, num_itemset + 1
+        Boundaries in packed items.
+    right_items: int32, num_right_item
+        Itemsets, concatenated.
+    right_offsets: int32, num_itemset + 1
+        Boundaries in packed items.
+    left_syn: float32, num_left_label x num_dimension
+        Feature embeddings.
+    right_syn: float32, num_right_label x num_dimension
+        Label embeddings.
+    left_weights: float32, num_left_item, optional
+        Item weights, concatenated.
+    right_weights: float32, num_right_item, optional
+        Item weights, concatenated.
+    num_negative: int32, optional
+        Number of negative samples.
+    learning_rate_scale: float32, optional
+        Learning rate multiplier.
+    batch_size: int32, optional
+        Batch size.
 
     """
 
@@ -161,7 +209,16 @@ class SupervisedTask(Task):
 
 
 class CompoundTask(Task):
-    """Group multiple sub-tasks together."""
+    """Group multiple sub-tasks together.
+
+    Parameters
+    ----------
+    *tasks: list of Task
+        Collection of tasks to train jointly.
+    learning_rate_scale: float32, optional
+        Learning rate multiplier.
+
+    """
 
     def __init__(self, *tasks, learning_rate_scale=1.0):
         super().__init__(learning_rate_scale)

@@ -48,7 +48,7 @@ Tasks are high-level building blocks used to define an optimization problem.
 Training Tools
 --------------
 
-Weight initialization and training loop helpers:
+Embeddings initialization and training loop helpers:
 
 .. autofunction:: initialize_syn
 .. autofunction:: train

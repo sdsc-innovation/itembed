@@ -30,7 +30,7 @@ def index_batch_stream(num_index, batch_size):
             i += batch_size
 
 
-def pack_itemsets(itemsets, *, min_count=1, min_length=2):
+def pack_itemsets(itemsets, *, min_count=1, min_length=1):
     """Convert itemset collection to packed indices.
 
     Parameters
@@ -50,6 +50,28 @@ def pack_itemsets(itemsets, *, min_count=1, min_length=2):
         Packed index array.
     offsets: int32, num_itemset + 1
         Itemsets offsets in packed array.
+
+    Example
+    -------
+    >>> itemsets = [
+    ...     ["apple"],
+    ...     ["apple", "sugar", "flour"],
+    ...     ["pear", "sugar", "flour", "butter"],
+    ...     ["apple", "pear", "sugar", "buffer", "cinnamon"],
+    ...     ["salt", "flour", "oil"],
+    ... ]
+    >>> pack_itemsets(itemsets, min_length=2)
+    (['apple',
+      'sugar',
+      'flour',
+      'pear',
+      'butter',
+      'buffer',
+      'cinnamon',
+      'salt',
+      'oil'],
+     array([0, 1, 2, 3, 1, 2, 4, 0, 3, 1, 5, 6, 7, 2, 8]),
+     array([ 0,  3,  7, 12, 15]))
 
     """
 
@@ -86,8 +108,7 @@ def pack_itemsets(itemsets, *, min_count=1, min_length=2):
 def prune_itemsets(indices, offsets, *, mask=None, min_length=None):
     """Filter packed indices.
 
-    Either an explicit mask or a length threshold must be defined, but both
-    cannot be provided at the same time.
+    Either an explicit mask or a length threshold must be defined.
 
     Parameters
     ----------
@@ -107,13 +128,24 @@ def prune_itemsets(indices, offsets, *, mask=None, min_length=None):
     offsets: int32, num_itemset + 1
         Itemsets offsets in packed array.
 
+    Example
+    -------
+    >>> indices = np.array([0, 0, 1, 0, 1, 2, 0, 1, 2, 3])
+    >>> offsets = np.array([0, 1, 3, 6, 10])
+    >>> mask = np.array([True, True, False, True])
+    >>> prune_itemsets(indices, offsets, mask=mask, min_length=2)
+    (array([0, 1, 0, 1, 2, 3]), array([0, 2, 6]))
+
     """
 
     # Build mask from length limit, if needed
     lengths = offsets[1:] - offsets[:-1]
     if min_length is not None:
-        assert mask is None
-        mask = lengths >= min_length
+        length_mask = lengths >= min_length
+        if mask is None:
+            mask = lengths >= length_mask
+        else:
+            mask = np.logical_and(mask, length_mask)
     assert lengths.shape == mask.shape
 
     # Allocate buffers
@@ -223,12 +255,12 @@ def softmax(x):
 
 
 def norm(x):
-    """L\ :sub:`2` norm."""
+    """L\\ :sub:`2` norm."""
 
     return np.sqrt((x ** 2).sum(axis=-1))
 
 
 def normalize(x):
-    """L\ :sub:`2` normalization."""
+    """L\\ :sub:`2` normalization."""
 
     return x / norm(x)[..., None]
