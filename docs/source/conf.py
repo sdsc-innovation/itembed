@@ -8,11 +8,13 @@ project = "itembed"
 # copyright = "2020, Johan Berdat"
 author = "Johan Berdat"
 
-release = '0.4.2'
+release = "0.5.0"
 
 extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.autodoc",
+    "sphinx.ext.mathjax",
+    "sphinxcontrib.bibtex",
 ]
 
 html_theme = "sphinx_rtd_theme"

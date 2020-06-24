@@ -6,3 +6,4 @@ itembed documentation
    :maxdepth: 2
 
    api
+   math

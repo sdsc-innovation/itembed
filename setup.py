@@ -8,7 +8,7 @@ with open("README.md", "r", encoding="utf-8") as file:
 setup(
 
     name = "itembed",
-    version = "0.4.2",
+    version = "0.5.0",
     packages = find_packages(),
 
     author = "Johan Berdat",

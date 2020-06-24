@@ -82,10 +82,10 @@ However, a small helper is provided for simple cases:
 from itembed import pack_itemsets
 
 itemsets = [
-    ['apple', 'sugar', 'flour'],
-    ['pear', 'sugar', 'flour', 'butter'],
-    ['apple', 'pear', 'sugar', 'buffer', 'cinnamon'],
-    ['salt', 'flour', 'oil'],
+    ["apple", "sugar", "flour"],
+    ["pear", "sugar", "flour", "butter"],
+    ["apple", "pear", "sugar", "buffer", "cinnamon"],
+    ["salt", "flour", "oil"],
     # ...
 ]
 
@@ -143,10 +143,10 @@ from itembed import (
 
 # Get your own itemsets
 itemsets = [
-    ['apple', 'sugar', 'flour'],
-    ['pear', 'sugar', 'flour', 'butter'],
-    ['apple', 'pear', 'sugar', 'buffer', 'cinnamon'],
-    ['salt', 'flour', 'oil'],
+    ["apple", "sugar", "flour"],
+    ["pear", "sugar", "flour", "butter"],
+    ["apple", "pear", "sugar", "buffer", "cinnamon"],
+    ["salt", "flour", "oil"],
     # ...
 ]
 
@@ -193,8 +193,8 @@ If you use this software in your work, it would be appreciated if you would cite
   author = {Johan Berdat},
   title = {itembed},
   url = {https://gitlab.com/jojolebarjos/itembed},
-  version = {0.4.2},
-  date = {2020-06-10},
+  version = {0.5.0},
+  date = {2020-06-24},
 }
 ```
 
@@ -206,31 +206,35 @@ If you use this software in your work, it would be appreciated if you would cite
         <i>Efficient Estimation of Word Representations in Vector Space</i>,
         2013,
         Tomas Mikolov, Kai Chen, Greg Corrado, Jeffrey Dean,
-        <https://arxiv.org/abs/1301.3781>
+        https://arxiv.org/abs/1301.3781
     </li>
     <li><a name="ref_starspace"></a>
         <i>StarSpace: Embed All The Things!</i>,
         2017,
         Ledell Wu, Adam Fisch, Sumit Chopra, Keith Adams, Antoine Bordes, Jason Weston,
-        <https://arxiv.org/abs/1709.03856>
+        https://arxiv.org/abs/1709.03856
     </li>
     <li><a name="ref_item2vec"></a>
         <i>Item2Vec: Neural Item Embedding for Collaborative Filtering</i>,
         2016,
         Oren Barkan, Noam Koenigstein,
-        <https://arxiv.org/abs/1603.04259>
+        https://arxiv.org/abs/1603.04259
     </li>
     <li><a name="ref_numba"></a>
         <i>Numba: a LLVM-based Python JIT compiler</i>,
         2015,
         Siu Kwan Lam, Antoine Pitrou, Stanley Seibert,
-        <https://doi.org/10.1145/2833157.2833162>
+        https://doi.org/10.1145/2833157.2833162
     </li>
 </ol>
 
 
 ## Changelog
 
+ * 0.5.0 - 2020-06-24
+    * Add weighted itemset support
+    * Improve documentation and examples
+    * Bug fixes
  * 0.4.2 - 2020-06-10
     * Clean documentation and examples
     * Bug fixes
