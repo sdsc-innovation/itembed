@@ -58,7 +58,7 @@ class UnsupervisedTask(Task):
         self._tmp_syn = np.empty(size, dtype=np.float32)
 
         # Instanciate index generator
-        num_itemset, = offsets.shape
+        num_itemset = offsets.shape[0] - 1
         self.batch_iterator = index_batch_stream(num_itemset, batch_size)
 
     def __len__(self):
@@ -133,8 +133,8 @@ class SupervisedTask(Task):
         self._tmp_syn = np.empty(size, dtype=np.float32)
 
         # Instanciate index generator
-        num_itemset, = left_offsets.shape
-        assert right_offsets.shape[0] == num_itemset
+        num_itemset = left_offsets.shape[0] - 1
+        assert right_offsets.shape == left_offsets.shape
         self.batch_iterator = index_batch_stream(num_itemset, batch_size)
 
     def __len__(self):
