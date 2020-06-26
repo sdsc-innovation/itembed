@@ -201,6 +201,7 @@ def train(
     *,
     num_epoch=10,
     initial_learning_rate=0.025,
+    final_learning_rate=0.0,
 ):
     """Train loop.
 
@@ -218,7 +219,9 @@ def train(
     num_epoch: int
         Number of passes across the whole task.
     initial_learning_rate: float
-        Maximum learning rate.
+        Maximum learning rate (inclusive).
+    final_learning_rate: float
+        Minimum learning rate (exclusive).
 
     """
 
@@ -227,13 +230,14 @@ def train(
         # Iterate over epochs and batches
         num_batch = len(task)
         num_step = num_epoch * num_batch
+        delta_learning_rate = final_learning_rate - initial_learning_rate
         step = 0
         with tqdm(total=num_step) as progress:
             for epoch in range(num_epoch):
                 for batch in range(num_batch):
 
                     # Learning rate decreases linearly
-                    learning_rate = (1 - step / num_step) * initial_learning_rate
+                    learning_rate = delta_learning_rate * step / num_step + initial_learning_rate
 
                     # Apply step
                     task.do_batch(learning_rate)

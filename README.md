@@ -89,7 +89,7 @@ itemsets = [
     # ...
 ]
 
-labels, indices, offsets = pack_itemsets(itemsets, min_count=2)
+labels, indices, offsets = pack_itemsets(itemsets, min_count=2, min_length=2)
 num_label = len(labels)
 ```
 
@@ -151,7 +151,7 @@ itemsets = [
 ]
 
 # Pack itemsets into contiguous arrays
-labels, indices, offsets = pack_itemsets(itemsets, min_count=2)
+labels, indices, offsets = pack_itemsets(itemsets, min_count=2, min_length=2)
 num_label = len(labels)
 
 # Initialize embeddings sets from uniform distribution
