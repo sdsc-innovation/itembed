@@ -174,7 +174,7 @@ def train(
 
     Learning rate decreases linearly, down to zero.
 
-    Keyboard interruption are silently captured, which interrupt the training
+    Keyboard interruptions are silently captured, which interrupt the training
     process.
 
     A progress bar is shown, using ``tqdm``.
