@@ -1,5 +1,5 @@
 
-# Stack Overflow Tags
+# Stack Overflow dataset
 
 The dataset has been extracted using the [Stack Exchange Data Explorer](https://data.stackexchange.com/).
 As described in the [documentation](https://data.stackexchange.com/help), the data is released under [CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/).
