@@ -1,4 +1,3 @@
-
 import math
 import random
 
@@ -164,9 +163,13 @@ def do_unsupervised_steps(
 
         # Apply update
         do_step(
-            left, right,
-            syn0, syn1, tmp_syn,
-            num_negative, learning_rate
+            left,
+            right,
+            syn0,
+            syn1,
+            tmp_syn,
+            num_negative,
+            learning_rate,
         )
 
 
@@ -225,9 +228,13 @@ def do_supervised_steps(
 
             # Apply update
             do_step(
-                left, right,
-                left_syn, right_syn, tmp_syn,
-                num_negative, learning_rate
+                left,
+                right,
+                left_syn,
+                right_syn,
+                tmp_syn,
+                num_negative,
+                learning_rate,
             )
 
 
@@ -285,7 +292,7 @@ def do_unsupervised_batch(
 
     for i in indices:
         do_unsupervised_steps(
-            items[offsets[i]:offsets[i+1]],
+            items[offsets[i] : offsets[i + 1]],
             syn0,
             syn1,
             tmp_syn,
@@ -363,8 +370,8 @@ def do_supervised_batch(
         j = left_indices[i]
         k = right_indices[i]
         do_supervised_steps(
-            left_items[left_offsets[j]:left_offsets[j+1]],
-            right_items[right_offsets[k]:right_offsets[k+1]],
+            left_items[left_offsets[j] : left_offsets[j + 1]],
+            right_items[right_offsets[k] : right_offsets[k + 1]],
             left_syn,
             right_syn,
             tmp_syn,

@@ -1,4 +1,3 @@
-
 from collections import Counter
 
 import numpy as np
@@ -26,7 +25,7 @@ def index_batch_stream(num_index, batch_size):
         np.random.shuffle(indices)
         i = 0
         while i + batch_size <= num_index:
-            yield indices[i:i+batch_size]
+            yield indices[i : i + batch_size]
             i += batch_size
 
 
@@ -62,7 +61,7 @@ def pack_itemsets(itemsets, *, min_count=1, min_length=2):
 
     # Define label list
     labels = [l for l, c in counter.most_common() if c >= min_count]
-    label_map = {l : i for i, l in enumerate(labels)}
+    label_map = {l: i for i, l in enumerate(labels)}
 
     # Generate indices
     indices = []
@@ -117,8 +116,8 @@ def prune_itemsets(indices, offsets, *, mask=None, min_length=None):
     assert lengths.shape == mask.shape
 
     # Allocate buffers
-    filtered_indices = np.zeros(lengths[mask].sum(), dtype=np.int32)
-    filtered_offsets = np.zeros(mask.sum() + 1, dtype=np.int32)
+    out_indices = np.zeros(lengths[mask].sum(), dtype=np.int32)
+    out_offsets = np.zeros(mask.sum() + 1, dtype=np.int32)
 
     # Build new itemsets
     offset = 0
@@ -127,11 +126,11 @@ def prune_itemsets(indices, offsets, *, mask=None, min_length=None):
         keep = mask[i]
         if keep:
             length = lengths[i]
-            filtered_indices[offset:offset+length] = indices[offsets[i]:offsets[i+1]]
+            out_indices[offset : offset + length] = indices[offsets[i] : offsets[i + 1]]
             offset += length
-            filtered_offsets[j] = offset
+            out_offsets[j] = offset
             j += 1
-    return filtered_indices, filtered_offsets
+    return out_indices, out_offsets
 
 
 def initialize_syn(num_label, num_dimension, method="uniform"):
