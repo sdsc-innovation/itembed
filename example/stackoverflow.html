@@ -13077,13 +13077,7 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Stack-Overflow-Tags">Stack Overflow Tags<a class="anchor-link" href="#Stack-Overflow-Tags">&#182;</a></h1><p>This notebook shows how to train dense vectors for question tags.</p>
-<p>The dataset has been extracted using the <a href="https://data.stackexchange.com/">Stack Exchange Data Explorer</a>, and is released under <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. The first one million questions with at least 4 tags were extracted:</p>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">Id</span><span class="p">,</span> <span class="n">Tags</span>
-<span class="k">FROM</span> <span class="n">Posts</span>
-<span class="k">WHERE</span> <span class="n">LEN</span><span class="p">(</span><span class="n">Tags</span><span class="p">)</span> <span class="o">-</span> <span class="n">LEN</span><span class="p">(</span><span class="k">REPLACE</span><span class="p">(</span><span class="n">Tags</span><span class="p">,</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span> <span class="o">&gt;=</span> <span class="mi">4</span>
-<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">Id</span>
-</pre></div>
+<h1 id="Stack-Overflow-Tags">Stack Overflow Tags<a class="anchor-link" href="#Stack-Overflow-Tags">&#182;</a></h1><p>This notebook shows how to train dense vectors for question tags. See <a href="./data/stackoverflow/README.md">this README</a> for more information about the dataset.</p>
 
 </div>
 </div>
@@ -13157,10 +13151,10 @@ div#notebook {
 
 
 
-<div id="e9349f8d-0058-4559-972d-c58ccda7ff1b"></div>
+<div id="a643e3be-f08c-4c0a-8c8a-a5d74c706db6"></div>
 <div class="output_subarea output_javascript ">
 <script type="text/javascript">
-var element = $('#e9349f8d-0058-4559-972d-c58ccda7ff1b');
+var element = $('#a643e3be-f08c-4c0a-8c8a-a5d74c706db6');
 
 (function(root) {
   function now() {
@@ -13472,7 +13466,7 @@ var element = $('#e9349f8d-0058-4559-972d-c58ccda7ff1b');
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Load raw dataset</span>
-<span class="n">tag_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;stackoverflow.csv&quot;</span><span class="p">)</span>
+<span class="n">tag_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;./data/stackoverflow/tags.csv&quot;</span><span class="p">)</span>
 <span class="n">tag_df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 </pre></div>
 
@@ -13810,10 +13804,10 @@ Mon Jul  6 14:02:19 2020 Finished embedding
 
 
 
-<div id="f2530941-7a59-47f7-add8-72a985b7c0b2"></div>
+<div id="f0689293-ccd4-455e-9bbf-94f0bc4790bb"></div>
 <div class="output_subarea output_javascript ">
 <script type="text/javascript">
-var element = $('#f2530941-7a59-47f7-add8-72a985b7c0b2');
+var element = $('#f0689293-ccd4-455e-9bbf-94f0bc4790bb');
 (function(root) {
   function embed_document(root) {
     

@@ -1,4 +1,3 @@
-
 from .optimization import (
     do_supervised_batch,
     do_unsupervised_batch,

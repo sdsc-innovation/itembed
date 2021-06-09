@@ -1,4 +1,3 @@
-
 import numpy as np
 
 from .optimization import do_unsupervised_batch, do_supervised_batch
@@ -47,7 +46,8 @@ class UnsupervisedTask(Task):
 
     """
 
-    def __init__(self,
+    def __init__(
+        self,
         items,
         offsets,
         syn0,
@@ -85,7 +85,7 @@ class UnsupervisedTask(Task):
         self.batch_iterator = index_batch_stream(num_itemset, batch_size)
 
     def __len__(self):
-        num_itemset, = self.offsets.shape
+        (num_itemset,) = self.offsets.shape
         return (num_itemset - 1) // self.batch_size + 1
 
     def do_batch(self, learning_rate):
@@ -137,7 +137,8 @@ class SupervisedTask(Task):
 
     """
 
-    def __init__(self,
+    def __init__(
+        self,
         left_items,
         left_offsets,
         right_items,
@@ -186,7 +187,7 @@ class SupervisedTask(Task):
         self.batch_iterator = index_batch_stream(num_itemset, batch_size)
 
     def __len__(self):
-        num_itemset, = self.left_offsets.shape
+        (num_itemset,) = self.left_offsets.shape
         return (num_itemset - 1) // self.batch_size + 1
 
     def do_batch(self, learning_rate):
