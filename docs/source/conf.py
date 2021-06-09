@@ -17,5 +17,7 @@ extensions = [
     "sphinxcontrib.bibtex",
 ]
 
+bibtex_bibfiles = ["references.bib"]
+
 html_theme = "sphinx_rtd_theme"
 html_show_copyright = False

@@ -5,5 +5,6 @@ itembed documentation
 .. toctree::
    :maxdepth: 2
 
-   api
+   start
    math
+   api

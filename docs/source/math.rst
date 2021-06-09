@@ -200,12 +200,6 @@ Each word has a probability
 of being discarded, where :math:`f(w_i)` is its frequency and :math:`t` a chosen threshold, typically around :math:`10^{-5}`.
 
 
-Parallelization
-^^^^^^^^^^^^^^^
-
-Hogwild :cite:`conf/nips/RechtRWN11`...
-
-
 References
 ----------
 
