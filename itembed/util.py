@@ -56,20 +56,12 @@ def pack_itemsets(itemsets, *, min_count=1, min_length=1):
     ...     ["apple"],
     ...     ["apple", "sugar", "flour"],
     ...     ["pear", "sugar", "flour", "butter"],
-    ...     ["apple", "pear", "sugar", "buffer", "cinnamon"],
+    ...     ["apple", "pear", "sugar", "butter", "cinnamon"],
     ...     ["salt", "flour", "oil"],
     ... ]
     >>> pack_itemsets(itemsets, min_length=2)
-    (['apple',
-      'sugar',
-      'flour',
-      'pear',
-      'butter',
-      'buffer',
-      'cinnamon',
-      'salt',
-      'oil'],
-     array([0, 1, 2, 3, 1, 2, 4, 0, 3, 1, 5, 6, 7, 2, 8]),
+    (['apple', 'sugar', 'flour', 'pear', 'butter', 'cinnamon', 'salt', 'oil'],
+     array([0, 1, 2, 3, 1, 2, 4, 0, 3, 1, 4, 5, 6, 2, 7]),
      array([ 0,  3,  7, 12, 15]))
 
     """
