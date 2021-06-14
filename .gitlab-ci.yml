@@ -7,6 +7,6 @@ pypi:
     - /^\d+\.\d+\.\d+([abc]\d*)?$/
   script:
     - apk add --no-cache gcc musl-dev libffi-dev libressl-dev
-    - pip install -U twine
+    - pip install -U twine "cryptography<=3.3"
     - python setup.py sdist bdist_wheel
     - twine upload dist/*
