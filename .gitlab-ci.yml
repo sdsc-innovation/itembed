@@ -1,12 +1,12 @@
 
 pypi:
-  image: python:3.6-alpine
+  image: alpine:3.12
   stage: deploy
   cache: {}
   only:
     - /^\d+\.\d+\.\d+([abc]\d*)?$/
   script:
-    - apk add --no-cache gcc musl-dev libffi-dev libressl-dev
+    - apk add --no-cache gcc musl-dev python3-dev libffi-dev libressl-dev py-pip
     - pip install -U twine "cryptography<=3.3"
     - python setup.py sdist bdist_wheel
     - twine upload dist/*
