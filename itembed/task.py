@@ -60,11 +60,20 @@ class UnsupervisedTask(Task):
     ):
         super().__init__(learning_rate_scale)
 
+        # Make sure that there are no index overflow
+        assert syn0.shape == syn1.shape, "synsets shape mismatch"
+        assert items.min() >= 0, "negative item index"
+        assert items.max() < syn0.shape[0], "out-of-bound item index"
+        assert offsets.shape[0] > 1, "no itemset"
+        assert offsets.min() >= 0, "negative offset"
+        assert offsets.max() <= items.shape[0], "out-of-bound offset"
+        assert (offsets[1:] - offsets[:-1] >= 2).all(), "itemset size must be >= 2"
+
         # Allocate unit weights, if needed
         if weights is None:
             weights = np.ones(items.shape[0], dtype=np.float32)
         else:
-            assert weights.shape == items.shape
+            assert weights.shape == items.shape, "weights shape mismatch"
 
         # Store parameters
         self.items = items
@@ -77,7 +86,6 @@ class UnsupervisedTask(Task):
 
         # Allocate internal buffer
         size = syn0.shape[1]
-        assert syn1.shape[1] == size
         self._tmp_syn = np.empty(size, dtype=np.float32)
 
         # Instanciate index generator
@@ -154,15 +162,31 @@ class SupervisedTask(Task):
     ):
         super().__init__(learning_rate_scale)
 
+        # Make sure that there are no index overflow
+        assert left_syn.shape[1] == right_syn.shape[1], "embedding size mismatch"
+        assert left_items.min() >= 0, "negative item index"
+        assert right_items.min() >= 0, "negative item index"
+        assert left_items.max() < left_syn.shape[0], "out-of-bound item index"
+        assert right_items.max() < right_syn.shape[0], "out-of-bound item index"
+        assert left_offsets.shape == right_offsets.shape, "offsets shape mismatch"
+        assert left_offsets.shape[0] > 1, "no itemset"
+        assert right_offsets.shape[0] > 1, "no itemset"
+        assert left_offsets.min() >= 0, "negative offset"
+        assert right_offsets.min() >= 0, "negative offset"
+        assert left_offsets.max() <= left_items.shape[0], "out-of-bound offset"
+        assert right_offsets.max() <= right_items.shape[0], "out-of-bound offset"
+        assert (left_offsets[1:] - left_offsets[:-1] >= 1).all(), "itemset size must be >= 1"
+        assert (right_offsets[1:] - right_offsets[:-1] >= 1).all(), "itemset size must be >= 1"
+
         # Allocate unit weights, if needed
         if left_weights is None:
             left_weights = np.ones(left_items.shape[0], dtype=np.float32)
         else:
-            assert left_weights.shape == left_items.shape
+            assert left_weights.shape == left_items.shape, "weights shape mismatch"
         if right_weights is None:
             right_weights = np.ones(right_items.shape[0], dtype=np.float32)
         else:
-            assert right_weights.shape == right_items.shape
+            assert right_weights.shape == right_items.shape, "weights shape mismatch"
 
         # Store parameters
         self.left_items = left_items
@@ -178,12 +202,10 @@ class SupervisedTask(Task):
 
         # Allocate internal buffer
         size = left_syn.shape[1]
-        assert right_syn.shape[1] == size
         self._tmp_syn = np.empty(size, dtype=np.float32)
 
         # Instanciate index generator
         num_itemset = left_offsets.shape[0] - 1
-        assert right_offsets.shape == left_offsets.shape
         self.batch_iterator = index_batch_stream(num_itemset, batch_size)
 
     def __len__(self):

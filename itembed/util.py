@@ -134,7 +134,7 @@ def prune_itemsets(indices, offsets, *, mask=None, min_length=None):
     if min_length is not None:
         length_mask = lengths >= min_length
         if mask is None:
-            mask = lengths >= length_mask
+            mask = length_mask
         else:
             mask = np.logical_and(mask, length_mask)
     assert lengths.shape == mask.shape
