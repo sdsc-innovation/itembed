@@ -7,7 +7,7 @@ Mathematical Background
 :cite:`wu2017starspace`, :cite:`barkan2016item2vec`...
 
 
-The Pair Paradygm
+The Pair Paradigm
 -----------------
 
 Item pairs are at the center of :cite:`journals/corr/abs-1301-3781` and its derivatives.
@@ -138,41 +138,51 @@ Hence:
 
 .. math::
 
-    P(a, b ; \mathbf{u}, \mathbf{v}) = \sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) \prod_{b' \in B^* \subseteq B} \left( 1 - \sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) \right)
+    P(a, b ; \mathbf{u}, \mathbf{v}) = \sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) \prod_{b' \in B^* \subseteq B} \left( 1 - \sigma \left( \mathbf{u}_a^T \mathbf{v}_{b'} \right) \right)
 
 .. math::
 
-    \mathcal{L} (a, b ; \mathbf{u}, \mathbf{v}) = -\log \sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) - \sum_{b' \in B^* \subseteq B} \log \left( 1 - \sigma \left( \mathbf{u}_a^T \mathbf{v}_b' \right) \right)
+    \mathcal{L} (a, b ; \mathbf{u}, \mathbf{v}) = -\log \sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) - \sum_{b' \in B^* \subseteq B} \log \left( 1 - \sigma \left( \mathbf{u}_a^T \mathbf{v}_{b'} \right) \right)
 
 For more details, see Goldberg and Levy's notes :cite:`goldberg2014word2vec`.
 
-To compute the gradient, let us rewrite the loss as:
 
-.. math::
+Gradient Computation
+^^^^^^^^^^^^^^^^^^^^
 
-    \mathcal{L} (a, b ; \mathbf{u}, \mathbf{v}) = -\ell_{a, b, 1} - \sum_{b' \in B^* \subseteq B} \ell_{a, b', 0}
-
-where
-
-.. math::
-
-    \ell_{a, b, y} = \log \sigma \left( y - \mathbf{u}_a^T \mathbf{v}_b \right)
-
-Then:
+In order to apply gradient descent, partial derivatives must be computed.
+As this is a sum, let us identify the two main terms:
 
 .. math::
 
     \begin{array}{lll}
-    \frac{\partial}{\partial \mathbf{u}_a} \ell (a, b, y) & = & \frac{1}{y - \sigma \left(\mathbf{u}_a^T \mathbf{v}_b \right)}
-    \left( - \sigma \left(\mathbf{u}_a^T \mathbf{v}_b \right) \left( 1 - \sigma \left(\mathbf{u}_a^T \mathbf{v}_b \right) \right) \right) \mathbf{v}_b \\
-    & = & \left( y - \sigma \left(\mathbf{u}_a^T \mathbf{v}_b \right) \right) \mathbf{v}_b
+    \frac{\partial}{\partial \mathbf{u}_a} -\log \sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) & = &
+    -\frac{\sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) \left( 1 - \sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) \right) }{\sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right)} \mathbf{v}_b \\
+    & = & \left( \sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) - 1 \right) \mathbf{v}_b
+    \end{array}
+    
+.. math::
+
+    \begin{array}{lll}
+    \frac{\partial}{\partial \mathbf{u}_a} -\log \left( 1 - \sigma \left( \mathbf{u}_a^T \mathbf{v}_{b'} \right) \right) & = &
+    -\frac{- \sigma \left( \mathbf{u}_a^T \mathbf{v}_{b'} \right) \left( 1 - \sigma \left( \mathbf{u}_a^T \mathbf{v}_{b'} \right) \right) }{1 - \sigma \left( \mathbf{u}_a^T \mathbf{v}_{b'} \right)} \mathbf{v}_{b'} \\
+    & = & \sigma \left( \mathbf{u}_a^T \mathbf{v}_{b'} \right) \mathbf{v}_{b'}
     \end{array}
 
-And similarly:
+As both terms are similar, we can rewrite them using the associated label :math:`y`:
 
 .. math::
 
-    \frac{\partial}{\partial \mathbf{v}_b} \ell (a, b, y) = \left( y - \sigma \left(\mathbf{u}_a^T \mathbf{v}_b \right) \right) \mathbf{u}_a
+    \ell_{a, b, y} = \left( \sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) - y \right) \mathbf{v}_b
+
+Therefore, the overall gradient is:
+
+.. math::
+
+    \frac{\partial}{\partial \mathbf{u}_a} \mathcal{L} (a, b ; \mathbf{u}, \mathbf{v}) =
+    \ell_{a, b, 1} + \sum_{b' \in B^* \subseteq B} \ell_{a, b', 0}
+
+A similar expansion can be done for :math:`\frac{\partial}{\partial \mathbf{v}_b} \mathcal{L} (a, b ; \mathbf{u}, \mathbf{v})`.
 
 
 Additional Considerations
