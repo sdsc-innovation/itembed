@@ -160,7 +160,7 @@ As this is a sum, let us identify the two main terms:
     -\frac{\sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) \left( 1 - \sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) \right) }{\sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right)} \mathbf{v}_b \\
     & = & \left( \sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) - 1 \right) \mathbf{v}_b
     \end{array}
-    
+
 .. math::
 
     \begin{array}{lll}
@@ -214,4 +214,3 @@ References
 ----------
 
 .. bibliography:: references.bib
-    

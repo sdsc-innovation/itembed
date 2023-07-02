@@ -254,7 +254,7 @@ def softmax(x):
 def norm(x):
     """L\\ :sub:`2` norm."""
 
-    return np.sqrt((x ** 2).sum(axis=-1))
+    return np.sqrt((x**2).sum(axis=-1))
 
 
 def normalize(x):

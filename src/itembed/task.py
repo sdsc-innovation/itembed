@@ -175,8 +175,12 @@ class SupervisedTask(Task):
         assert right_offsets.min() >= 0, "negative offset"
         assert left_offsets.max() <= left_items.shape[0], "out-of-bound offset"
         assert right_offsets.max() <= right_items.shape[0], "out-of-bound offset"
-        assert (left_offsets[1:] - left_offsets[:-1] >= 1).all(), "itemset size must be >= 1"
-        assert (right_offsets[1:] - right_offsets[:-1] >= 1).all(), "itemset size must be >= 1"
+        assert (
+            left_offsets[1:] - left_offsets[:-1] >= 1
+        ).all(), "itemset size must be >= 1"
+        assert (
+            right_offsets[1:] - right_offsets[:-1] >= 1
+        ).all(), "itemset size must be >= 1"
 
         # Allocate unit weights, if needed
         if left_weights is None:
