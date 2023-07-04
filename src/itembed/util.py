@@ -50,8 +50,8 @@ def pack_itemsets(itemsets, *, min_count=1, min_length=1):
     offsets: int32, num_itemset + 1
         Itemsets offsets in packed array.
 
-    Example
-    -------
+    Examples
+    --------
     >>> itemsets = [
     ...     ["apple"],
     ...     ["apple", "sugar", "flour"],
@@ -119,8 +119,8 @@ def prune_itemsets(indices, offsets, *, mask=None, min_length=None):
     offsets: int32, num_itemset + 1
         Itemsets offsets in packed array.
 
-    Example
-    -------
+    Examples
+    --------
     >>> indices = np.array([0, 0, 1, 0, 1, 2, 0, 1, 2, 3])
     >>> offsets = np.array([0, 1, 3, 6, 10])
     >>> mask = np.array([True, True, False, True])
