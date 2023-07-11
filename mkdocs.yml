@@ -4,13 +4,25 @@ repo_url: https://github.com/jojolebarjos/itembed
 
 nav:
   - Home: index.md
-  - Math: math.md
-  - API: api.md
+  - Getting started: start.md
+  - Mathematical details: math.md
+  - User interface: api.md
 
 theme:
   name: material
   features:
     - content.code.copy
+    - navigation.footer
+    - navigation.indexes
+    - navigation.sections
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.suggest
+    - toc.follow
+  palette:
+    primary: black
+    accent: indigo
 
 plugins:
   - search
@@ -19,9 +31,16 @@ plugins:
       handlers:
         python:
           options:
-            show_root_heading: true
-            show_source: false
             docstring_style: numpy
+            show_root_heading: true
+            show_root_full_path: false
+            show_object_full_path: false
+            line_length: 88
+            show_source: true
+            show_signature: true
+            show_signature_annotations: true
+            separate_signature: true
+            signature_crossrefs: true
   - bibtex:
       bib_file: docs/references.bib
 
@@ -37,6 +56,8 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
+  - toc:
+      permalink: "#"
 
 extra_javascript:
   - javascripts/mathjax.js

@@ -1,15 +1,15 @@
-# Mathematical Background
+# Mathematical details
 
 [@wu2017starspace;@barkan2017item2vec] ...
 
 
-## The Pair Paradigm
+## The pair paradigm
 
 Item pairs are at the center of [@mikolov2013efficient] and its derivatives.
 Instead of processing a whole sequence, only two items are considered at a single step. This section discusses how to select them and what they represent.
 
 
-### Input-Output
+### Input-output
 
 The most straightforward way to define an item pair is in the supervised case.
 The left-hand side is the input (a.k.a. feature item) and the right-hand side is the output (a.k.a. label item).
@@ -17,15 +17,15 @@ The left-hand side is the input (a.k.a. feature item) and the right-hand side is
 ...
 
 
-### Skip-Gram
+### Skip-gram
 
 ...
 
 
-## Why Negative Sampling?
+## Why negative sampling?
 
 
-### Softmax Formulation
+### Softmax formulation
 
 Let \((a, b)\) a pair of items, where \(a \in A\) is the source and \(b \in B\) the target.
 The actual meaning depends on the use case, as
@@ -44,7 +44,7 @@ The log-likelihood is therefore defined as:
 However, this implies a summation over every \(b \in B\), which is computationally expensive for large vocabularies.
 
 
-### Noise Contrastive Estimation Formulation
+### Noise contrastive estimation formulation
 
 Noise Contrastive Estimation (Gutmann and Hyvärinen [@gutmann2010noise]) is proposed by Mnih and Teh [@mnih2012fast] as a stable sampling method, to reduce the cost induced by softmax computation.
 In a nutshell, the model is trained to distinguish observed (positive) samples from random noise.
@@ -85,7 +85,7 @@ The negative log-likelihood can then be computed as usual:
 Mnih and Teh [@mnih2012fast] report that using \(k = 25\) is sufficient to match the performance of the regular softmax.
 
 
-### Negative Sampling Formulation
+### Negative sampling formulation
 
 Negative Sampling, popularised by Mikolov et al. [@mikolov2013distributed], can be seen as an approximation of NCE.
 As defined previously, NCE is based on the following:
@@ -106,7 +106,7 @@ Hence:
 For more details, see Goldberg and Levy's notes [@goldberg2014word2vec].
 
 
-### Gradient Computation
+### Gradient computation
 
 In order to apply gradient descent, partial derivatives must be computed.
 As this is a sum, let us identify the two main terms:
@@ -141,7 +141,7 @@ Therefore, the overall gradient is:
 A similar expansion can be done for \(\frac{\partial}{\partial \mathbf{v}_b} \mathcal{L} (a, b ; \mathbf{u}, \mathbf{v})\).
 
 
-## Additional Considerations
+## Additional considerations
 
 
 ### Normalization
@@ -159,6 +159,3 @@ Each word has a probability
 \[ P(w_i) = 1 - \sqrt{ \left( \frac{t}{f(w_i)} \right) } \]
 
 of being discarded, where \(f(w_i)\) is its frequency and \(t\) a chosen threshold, typically around \(10^{-5}\).
-
-
-## References
