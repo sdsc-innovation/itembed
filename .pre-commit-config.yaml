@@ -10,7 +10,12 @@ repos:
   - id: check-yaml
   - id: end-of-file-fixer
   - id: trailing-whitespace
-- repo: https://github.com/psf/black
-  rev: 22.8.0
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.1.13
   hooks:
-  - id: black
+    - id: ruff
+      types_or: [ python, pyi, jupyter ]
+      args: [ --exit-zero ]
+      verbose: true
+    - id: ruff-format
+      types_or: [ python, pyi, jupyter ]
