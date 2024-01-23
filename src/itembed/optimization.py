@@ -64,16 +64,12 @@ def do_step(
 
     num_right, num_dimension = syn_right.shape
 
-    # Approximate softmax update
+    # Approximate softmax, by applying a single positive and many negative updates
     tmp_syn[:] = 0
     for n in range(num_negative + 1):
-
-        # Apply a single positive update
         if n == 0:
             target = right
             label = 1
-
-        # And several negative updates
         else:
             target = random.randint(0, num_right - 1)
             label = 0
@@ -155,15 +151,11 @@ def do_unsupervised_steps(
     num_label, num_dimension = syn0.shape
     length = itemset.shape[0]
 
-    # Enumerate words
+    # For each word, update a single random neighbor
     for i in range(length):
-
-        # Choose a single random neighbor
         j = random.randint(0, length - 2)
         if j >= i:
             j += 1
-
-        # Apply update
         do_step(
             itemset[i],
             itemset[j],
@@ -230,13 +222,10 @@ def do_supervised_steps(
 
     """
 
-    # For each pair
     # TODO maybe need to apply subsampling?
     # TODO possibly two passes, to garantee that each item set is fully used?
     for i in range(len(left_itemset)):
         for j in range(len(right_itemset)):
-
-            # Apply update
             do_step(
                 left_itemset[i],
                 right_itemset[j],

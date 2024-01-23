@@ -5,7 +5,6 @@ from itembed import pack_itemsets
 
 
 def test_pack_itemsets():
-
     itemsets = [
         ["apple"],
         ["apple", "sugar", "flour"],

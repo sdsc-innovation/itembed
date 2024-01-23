@@ -216,9 +216,8 @@ def train(
 
     """
 
+    # Iterate over epochs and batches, with linearly decreasing learning rate
     try:
-
-        # Iterate over epochs and batches
         num_batch = len(task)
         num_step = num_epoch * num_batch
         delta_learning_rate = final_learning_rate - initial_learning_rate
@@ -226,16 +225,10 @@ def train(
         with tqdm(total=num_step) as progress:
             for epoch in range(num_epoch):
                 for batch in range(num_batch):
-
-                    # Learning rate decreases linearly
                     learning_rate = (
                         delta_learning_rate * step / num_step + initial_learning_rate
                     )
-
-                    # Apply step
                     task.do_batch(learning_rate)
-
-                    # Update progress
                     step += 1
                     progress.update(1)
 
