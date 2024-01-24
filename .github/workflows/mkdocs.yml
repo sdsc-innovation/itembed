@@ -1,9 +1,12 @@
 name: Deploy MkDocs on GitHub Pages
 
-on: [push]
+on:
+  push:
+    branches:
+    - main
 
 concurrency:
-  group: "pages"
+  group: ${{ github.workflow }}
   cancel-in-progress: false
 
 jobs:
