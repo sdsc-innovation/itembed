@@ -26,7 +26,7 @@ pip install itembed
 Or install from source, to ensure latest version:
 
 ```
-pip install git+https://gitlab.com/jojolebarjos/itembed.git
+pip install git+https://github.com/jojolebarjos/itembed.git
 ```
 
 
@@ -192,9 +192,9 @@ If you use this software in your work, it would be appreciated if you would cite
 @software{itembed,
   author = {Johan Berdat},
   title = {itembed},
-  url = {https://gitlab.com/jojolebarjos/itembed},
-  version = {0.5.0},
-  date = {2021-09-03},
+  url = {https://github.com/jojolebarjos/itembed},
+  version = {0.6.0},
+  date = {2024-xx-xx},
 }
 ```
 
@@ -231,6 +231,8 @@ If you use this software in your work, it would be appreciated if you would cite
 
 ## Changelog
 
+ * 0.6.0 - 2024-xx-xx
+    * ...
  * 0.5.0 - 2021-09-03
     * Add weighted itemset support
     * Improve documentation and examples

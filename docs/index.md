@@ -19,8 +19,8 @@ If you use this software in your work, it would be appreciated if you would cite
 @software{itembed,
   author = {Johan Berdat},
   title = {itembed},
-  url = {https://gitlab.com/jojolebarjos/itembed},
-  version = {0.5.0},
-  date = {2021-09-03},
+  url = {https://github.com/jojolebarjos/itembed},
+  version = {0.6.0},
+  date = {2024-xx-xx},
 }
 ```

@@ -24,3 +24,5 @@ from .task import (
     SupervisedTask,
     CompoundTask,
 )
+
+__version__ = "0.6.0"
