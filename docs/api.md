@@ -1,4 +1,4 @@
-# User interface
+# Reference
 
 This part of the documentation covers the public interface of itembed.
 

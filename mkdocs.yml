@@ -4,9 +4,15 @@ repo_url: https://github.com/jojolebarjos/itembed
 
 nav:
   - Home: index.md
-  - Getting started: start.md
-  - Mathematical details: math.md
-  - User interface: api.md
+  - install.md
+  - start.md
+  - math.md
+  - api.md
+  - Examples:
+    - notebooks/recipes.ipynb
+    - notebooks/retail.ipynb
+    - notebooks/stackoverflow.ipynb
+    - notebooks/word2vec.ipynb
 
 theme:
   name: material
@@ -42,6 +48,7 @@ plugins:
             signature_crossrefs: true
   - bibtex:
       bib_file: docs/references.bib
+  - mkdocs-jupyter
 
 markdown_extensions:
   - admonition

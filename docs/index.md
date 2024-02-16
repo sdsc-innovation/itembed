@@ -1,14 +1,13 @@
 # Welcome to `itembed`
 
-This is yet another variation of the well-known _word2vec_ method, proposed by Mikolov et al.[@mikolov2013efficient], applied to unordered sequences, which are commonly referred as itemsets. The contribution of _itembed_ is twofold:
+This is yet another variation of the well-known word2vec method, proposed by Mikolov et al.[@mikolov2013efficient], applied to unordered sequences, which are commonly referred as itemsets.
+The contribution of `itembed` is twofold:
 
- 1. Modifying the base algorithm to handle unordered sequences, which has an
-    impact on the definition of context windows;
- 2. Using the two embedding sets introduced in _word2vec_ for supervised
-    learning.
+ 1. Modifying the base algorithm to handle unordered sequences, which has an impact on the definition of context windows;
+ 2. Using the two embedding sets introduced in word2vec for supervised learning.
 
-A similar philosophy is described by Wu et al. in _StarSpace_[@wu2017starspace] and by Barkan and Koenigstein in _item2vec_[@barkan2017item2vec].
-_itembed_ uses Numba[@lam2015numba] to achieve high performances.
+A similar philosophy is described by Wu et al. in StarSpace[@wu2017starspace] and by Barkan and Koenigstein in item2vec[@barkan2017item2vec].
+`itembed` uses Numba[@lam2015numba] to achieve high performances.
 
 
 ## Citation
