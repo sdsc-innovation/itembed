@@ -1,171 +1,176 @@
 # Mathematical details
 
 The `itembed` framework is built upon word2vec[@mikolov2013efficient], StarSpace[@wu2017starspace], and item2vec[@barkan2017item2vec].
-These methodologies collectively aim to convert discrete items, such as words or products, into vectors that represent meaningful positions in a high-dimensional space.
+These approaches aim to convert discrete items, such as words or products, into vectors that represent meaningful positions in a high-dimensional space.
 This section outlines the mathematical framework behind `itembed`, specifically focusing on the pair prediction mechanism and the concept of negative sampling.
 
 
 ## The pair paradigm
 
-In word2vec, two approaches are depicted for training embeddings:
+In word2vec, two formulations are proposed for training embeddings:
 
  * _Skip-Gram Model_:
-   This approach predicts the surrounding context for a given target word.
-   It is characterized by its ability to take a single input and predict multiple contextual outputs.
+   This approach predicts the surrounding context for a given word.
+   It takes a single input and predict multiple contextual outputs.
  * _Continuous Bag Of Words (CBOW)_:
    Conversely, the CBOW model uses the context of surrounding words to predict a target word, effectively consolidating multiple inputs into a single output.
 
-Despite their distinct methodologies, both the skip-gram and CBOW models rely fundamentally on the concept of item pairs.
-This could involve a word and its surrounding context in the skip-gram model or the context pointing towards a word in the CBOW model.
+Despite their distinct methodologies, both the skip-gram and CBOW models rely fundamentally on the concept of pairs.
+More precisely, a _feature_ word $a$ is used to predict a _label_ word $b$, representing a single sample pair $(a, b)$.
 The models are essentially training a shallow neural network for multi-class classification, on a vast number of these pairs derived from extensive corpora.
 
-In unsupervised learning scenarios within `itembed`, the strategy is to select item pairs that occur within the same context, utilizing their co-occurrence to uncover underlying patterns.
-For supervised learning tasks, the focus shifts to combining items from separate itemsets, where a pair is composed of a 'feature item' from one itemset and a 'label item' from a different one.
+The main challenge is to choose training pairs according to the available data.
+In unsupervised learning scenarios, the strategy is to select item pairs that occur within the same context, utilizing their co-occurrence to uncover underlying patterns.
+For supervised learning tasks, the focus shifts to combining items from separate itemsets, where a pair is composed of a feature item from one itemset and a label item from a different one.
+
+!!! note
+
+    Wu et al.[@wu2017starspace] provide a wide range of applications and examples of pair selection strategies, including recommendation systems and multi-relational graphs.
 
 
 ## Why negative sampling?
 
 Word2vec also addresses the challenge of the computational cost associated with the softmax function used in multi-class classification, especially when dealing with a large number of classes.
-Typically, vocabularies consist of tens of thousands of unique words, and because softmax necessitates normalization across all classes, the computational burden for each update can be significant.
-To mitigate this issue, word2vec introduces several simplification techniques.
+Typically, vocabularies consist of tens of thousands of unique words, and because softmax requires normalization across all classes, the computational burden for each update can be significant.
+To mitigate this issue, word2vec introduces several simplifications.
 
 
 ### Softmax formulation
 
-Let $(a, b)$ a pair of items, where $a \in A$ is the source and $b \in B$ the target.
+Let $(a, b)$ a pair of items, where $a \in A$ is the input and $b \in B$ the output.
 The actual meaning depends on the use case, as discussed above.
 
 Furthermore, let $\mathbf{u} \in \mathbb{R}^{|A| \times d}$ and $\mathbf{v} \in \mathbb{R}^{|B| \times d}$ the two embedding sets with dimension size $d$.
 We denote $\mathbf{u}_a \in \mathbb{R}^d$ and $\mathbf{v}_b \in \mathbb{R}^d$ the embedding vectors of $a$ and $b$, respectively.
+The model outputs a score, akin to similarity, as follows:
 
-The conditional probability of observing $b$ given $a$ is defined by a softmax on all possibilities:
+$$ f(a, b ; \mathbf{u}, \mathbf{v}) = \mathbf{u}_a^T \mathbf{v}_b $$
 
-$$ P(b \mid a ; \mathbf{u}, \mathbf{v}) = \frac{e^{\mathbf{u}_a^T \mathbf{v}_b}}{\sum_{b'} e^{\mathbf{u}_a^T \mathbf{v}_{b'}}} $$
+In the context of multi-class classification, the [softmax function](https://en.wikipedia.org/wiki/Softmax_function) is used to model the conditional probability of observing class $b$ given input $a$:
 
-The negative log-likelihood is therefore defined as:
+$$ P(b \mid a ; \mathbf{u}, \mathbf{v}) = \frac{e^{f(a, b ; \mathbf{u}, \mathbf{v})}}{\sum_{b'} e^{f(a, b ; \mathbf{u}, \mathbf{v})}} $$
 
-$$ \mathcal{L} (a, b ; \mathbf{u}, \mathbf{v}) = -\log P(b \mid a ; \mathbf{u}, \mathbf{v}) = -\mathbf{u}_a^T \mathbf{v}_b + \log \sum_{b'} e^{\mathbf{u}_a^T \mathbf{v}_{b'}} $$
+The likelihood quantifies how well the model parameters, $\mathbf{u}$ and $\mathbf{v}$, explain the observed data.
+During training, these parameters are adjusted to maximize the likelihood, representing the joint probability of the training data.
+Assuming independence among input-output pairs, the likelihood is given by:
 
-In practice, gradient descent is used to minimize \mathcal{L}.
-The update rule for $\mathbf{u}_a$ is based on its partial derivative:
+$$ \mathcal{L} (\mathbf{u}, \mathbf{v}) = \prod_{a,b} P(b \mid a ; \mathbf{u}, \mathbf{v}) $$
 
-$$ \frac{\partial}{\partial \mathbf{u}_a} \mathcal{L} (a, b ; \mathbf{u}, \mathbf{v}) = -\mathbf{v}_b + \sum_{b'} P(b' \mid a ; \mathbf{u}, \mathbf{v}) \mathbf{v}_{b'} $$
+For numerical stability and simplification, the Negative Log-Likelihood (NLL) is minimized.
+Focusing on a single data pair:
 
-However, this implies a summation over every $b \in B$, which is computationally expensive for large vocabularies.
+$$ l (a, b ; \mathbf{u}, \mathbf{v}) = -\log P(b \mid a ; \mathbf{u}, \mathbf{v}) $$
+
+In practice, gradient descent is used to minimize $l (a, b ; \mathbf{u}, \mathbf{v})$.
+The gradient with respect to $\mathbf{v}_b$ is derived using the chain rule:
+
+$$ \frac{\partial l (a, b ; \mathbf{u}, \mathbf{v})}{\partial \mathbf{v}_b} = \frac{\partial l (a, b ; \mathbf{u}, \mathbf{v})}{\partial P(b \mid a ; \mathbf{u}, \mathbf{v})} \frac{\partial P(b \mid a ; \mathbf{u}, \mathbf{v})}{\partial f(a, b ; \mathbf{u}, \mathbf{v})} \frac{\partial f(a, b ; \mathbf{u}, \mathbf{v})}{\partial \mathbf{v}_b} $$
+
+$$ \frac{\partial l (a, b ; \mathbf{u}, \mathbf{v})}{\partial P(b \mid a ; \mathbf{u}, \mathbf{v})} = -\frac{1}{P(b \mid a ; \mathbf{u}, \mathbf{v})} $$
+
+$$ \frac{\partial P(b \mid a ; \mathbf{u}, \mathbf{v})}{\partial f(a, b ; \mathbf{u}, \mathbf{v})} = P(b \mid a ; \mathbf{u}, \mathbf{v}) \left( 1 - P(b \mid a ; \mathbf{u}, \mathbf{v}) \right) $$
+
+$$ \frac{\partial f(a, b ; \mathbf{u}, \mathbf{v})}{\partial \mathbf{v}_b} = \mathbf{u}_a^T $$
+
+Therefore, and by symmetry:
+
+$$ \frac{\partial l (a, b ; \mathbf{u}, \mathbf{v})}{\partial \mathbf{v}_b} = \left( P(b \mid a ; \mathbf{u}, \mathbf{v}) - 1 \right) \mathbf{u}_a^T $$
+
+$$ \frac{\partial l (a, b ; \mathbf{u}, \mathbf{v})}{\partial \mathbf{u}_a} = \left( P(a \mid b ; \mathbf{u}, \mathbf{v}) - 1 \right) \mathbf{v}_b^T $$
+
+Hence, gradient descent on a softmax activation requires a summation over the whole sets $A$ and $B$, which is computationally expensive for large vocabularies.
+
+!!! note
+
+    A more detailed derivation of the softmax gradient is provided by Miranda[@miranda2017softmax].
 
 
 ### Noise contrastive estimation formulation
 
-Noise Contrastive Estimation (NCE), introduced by Gutmann and Hyvärinen [@gutmann2010noise], is proposed by Mnih and Teh [@mnih2012fast] as a stable sampling method, to reduce the cost induced by softmax computation.
-In a nutshell, the model is trained to distinguish observed (positive) samples from random noise.
-Logistic regression is applied to minimize the negative log-likelihood, i.e. cross-entropy of our training example against the $k$ noise samples:
+Noise Contrastive Estimation (NCE) was introduced by Gutmann and Hyvärinen[@gutmann2010noise] and later proposed by Mnih and Teh[@mnih2012fast] as an efficient sampling method to alleviate the computational burden of the softmax function.
+NCE simplifies the task to a binary classification problem, where the model learns to differentiate between actual training data (positive samples) and artificially generated noise (negative samples).
 
-$$ \mathcal{L} (a, b) = - \log P(y = 1 \mid a, b) + k \mathbb{E}_{b' \sim Q}\left[ - \log P(y = 0 \mid a, b) \right] $$
+The process involves generating samples from two distinct distributions: positive samples are drawn directly from the empirical training set, whereas negative samples are produced from a predefined noise distribution, denoted by $\eta$.
+For every genuine sample pair $(a, b)$, $k$ negative counterparts $(a, b_i')$ are generated, where $b_i'$ are sampled from $\eta$.
 
-To avoid computating the expectation on the whole vocabulary, a Monte Carlo approximation is applied. $B^* \subseteq B$, with $\vert B^* \vert = k$, is therefore the set of random samples used to estimate it:
+For positive samples (where $y=1$), the probability corresponds to the softmax formulation:
 
-$$ \mathcal{L} (a, b) = - \log P(y = 1 \mid a, b) - k \sum_{b' \in B^* \subseteq B} \log P(y = 0 \mid a, b') $$
+$$ P(b \mid y=1, a; \mathbf{u}, \mathbf{v}) = \frac{e^{f(a, b ; \mathbf{u}, \mathbf{v})}}{\sum_{b'} e^{f(a, b ; \mathbf{u}, \mathbf{v})}} $$
 
-We are effectively generating samples from two different distributions: positive pairs are sampled from the empirical training set, while negative pairs come from the noise distribution $Q$.
+For negative samples (where $y=0$), $b$ is sampled from $\eta$.
+For instance, assuming $\eta$ is uniform:
 
-$$ P(y, b \mid a) = \frac{1}{k + 1} P(b \mid a) + \frac{k}{k + 1} Q(b) $$
+$$ P(b \mid y=0) = \frac{1}{|B|} $$
 
-Hence, the probability that a sample came from the training distribution:
+The sampling rates for positive and negative samples lead to the joint probability:
 
-$$ P(y = 1 \mid a, b) = \frac{P(b \mid a)}{P(b \mid a) + k Q(b)} $$
+$$ P(y=0) = \frac{k}{k+1}, \qquad P(y=1) = \frac{1}{k+1} $$
 
-$$ P(y = 0 \mid a, b) = 1 - P(y = 1 \mid a, b) $$
+$$ P(y, b \mid a; \mathbf{u}, \mathbf{v}) = P(y=0) P(b \mid y=0) + P(y=1) P(b \mid y=1, a; \mathbf{u}, \mathbf{v}) $$
 
-However, $P(b \mid a)$ is still defined as a softmax:
+Leveraging conditional probabilities, the binary classification model is defined as following:
 
-$$ P(b \mid a ; \mathbf{u}, \mathbf{v}) = \frac{e^{\mathbf{u}_a^T \mathbf{v}_b}}{\sum_{b'} e^{\mathbf{u}_a^T \mathbf{v}_{b'}}} $$
+$$ P(y = 0 \mid a, b; \mathbf{u}, \mathbf{v}) = \frac{k P(b \mid y=0)}{k P(b \mid y=0) + P(b \mid y=1, a; \mathbf{u}, \mathbf{v})} $$
 
-Both Mnih and Teh [@mnih2012fast] and Vaswani et al. [@vaswani2013decoding] arbitrarily set the denominator to 1.
-The underlying idea is that, instead of explicitly computing this value, it could be defined as a trainable parameter.
-Zoph et al. [@zoph2016simple] actually report that even when trained, it stays close to 1 with a low variance.
+$$ P(y = 1 \mid a, b; \mathbf{u}, \mathbf{v}) = \frac{P(b \mid y=1, a; \mathbf{u}, \mathbf{v})}{k P(b \mid y=0) + P(b \mid y=1, a; \mathbf{u}, \mathbf{v})} $$
 
-Hence:
+The likelihood for a single input-output pair $(a, b)$ combines the probability of correctly identifying both $b$ as a positive sample and $b_i'$ as negative ones:
 
-$$ P(b \mid a ; \mathbf{u}, \mathbf{v}) = e^{\mathbf{u}_a^T \mathbf{v}_b} $$
+$$ l (a, b ; \mathbf{u}, \mathbf{v}) = - \log P(y = 1 \mid a, b; \mathbf{u}, \mathbf{v}) - \sum_{i=1, b_i' \sim \eta}^k \log P(y = 0 \mid a, b_i'; \mathbf{u}, \mathbf{v}) $$
 
-The negative log-likelihood can then be computed as usual:
+At this point, it should be noted that both terms still depend on the softmax function over the whole $B$ set.
+Both Mnih and Teh[@mnih2012fast] and Vaswani et al.[@vaswani2013decoding] discuss the computational cost of the softmax function denominator, acting as a normalization term:
 
-$$ \mathcal{L} (a, b ; \mathbf{u}, \mathbf{v}) = -\log P (a, b ; \mathbf{u}, \mathbf{v}) $$
+$$ P(b \mid y=1, a; \mathbf{u}, \mathbf{v}) = \frac{e^{f(a, b ; \mathbf{u}, \mathbf{v})}}{\sum_{b'} e^{f(a, b ; \mathbf{u}, \mathbf{v})}} = \frac{e^{f(a, b ; \mathbf{u}, \mathbf{v})}}{Z_{\mathbf{u}, \mathbf{v}}(a)} $$
+
+To mitigate this, one proposed strategy involves introducing trainable parameters $z_a$, aimed at approximating $Z_{\mathbf{u}, \mathbf{v}}(a)$ and being optimized jointly during the training process.
+Interestingly, Mnih and Teh found that simply setting $z_a=1$ does not affect model performance.
+Supporting this, Zoph et al.[@zoph2016simple] observed that even when $z_a$ is allowed to vary during training, it remains close to 1, exhibiting low variance.
+Consequently, a practical approach is to adopt a fixed value of 1 for $z_a$, simplifying the equations and reducing computational overhead without compromising model efficacy:
+
+$$ P(b \mid y=1, a; \mathbf{u}, \mathbf{v}) = e^{f(a, b ; \mathbf{u}, \mathbf{v})} $$
+
+$$ P(y = 1 \mid a, b; \mathbf{u}, \mathbf{v}) = \frac{e^{f(a, b ; \mathbf{u}, \mathbf{v})}}{k P(b \mid y=0) + e^{f(a, b ; \mathbf{u}, \mathbf{v})}} $$
 
 Mnih and Teh [@mnih2012fast] report that using $k = 25$ is sufficient to match the performance of the regular softmax.
+
+!!! note
+
+    By setting the denominator to 1, as proposed above, the model has to essentially learn to self-normalize.
+    Devlin et al.[@devlin2014fast] add a squared error penalty to enforce this equivalence.
+    Andreas and Klein[@andreas2015and] suggest that it should even be sufficient to only normalize a fraction of the training examples and still obtain approximate self-normalising behaviour.
 
 
 ### Negative sampling formulation
 
-Negative Sampling, popularised by Mikolov et al. [@mikolov2013distributed], can be seen as an approximation of NCE.
-As defined previously, NCE is based on the following:
+Negative Sampling, popularised by Mikolov et al.[@mikolov2013distributed], can be seen as an approximation of NCE.
+It simplifies this computation by replacing $k P(b \mid y=0)$ by 1, leading to the [sigmoid function](https://en.wikipedia.org/wiki/Sigmoid_function) $\sigma(x)$.
+Note that equality holds, in theory, only when $k = |B|$ and $\eta$ is the uniform distribution.
 
-$$ P(y = 1 \mid a, b ; \mathbf{u}, \mathbf{v}) = \frac{e^{\mathbf{u}_a^T \mathbf{v}_b}}{e^{\mathbf{u}_a^T \mathbf{v}_b} + k Q(b)} $$
+$$ \sigma(x) = \frac{e^x}{1 + e^x}, \quad \frac{\partial \sigma(x)}{\partial x} = \sigma(x) \left(1 - \sigma(x) \right) $$
 
-Negative Sampling simplifies this computation by replacing $k Q(b)$ by 1.
-Note that $k Q(b) = 1$ is true when $B^* = B$ and $Q$ is the uniform distribution.
+$$ P(y = 0 \mid a, b; \mathbf{u}, \mathbf{v}) = \frac{1}{1 + e^{f(a, b ; \mathbf{u}, \mathbf{v})}} = 1 - \sigma\left(f(a, b ; \mathbf{u}, \mathbf{v})\right) $$
 
-$$ P(y = 1 \mid a, b ; \mathbf{u}, \mathbf{v}) = \frac{e^{\mathbf{u}_a^T \mathbf{v}_b}}{e^{\mathbf{u}_a^T \mathbf{v}_b} + 1} = \sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) $$
+$$ P(y = 1 \mid a, b; \mathbf{u}, \mathbf{v}) = \frac{e^{f(a, b ; \mathbf{u}, \mathbf{v})}}{1 + e^{f(a, b ; \mathbf{u}, \mathbf{v})}} = \sigma\left(f(a, b ; \mathbf{u}, \mathbf{v})\right) $$
 
-Hence:
+$$ P(y \mid a, b; \mathbf{u}, \mathbf{v}) = (1-y) P(y = 0 \mid a, b; \mathbf{u}, \mathbf{v}) + y P(y = 1 \mid a, b; \mathbf{u}, \mathbf{v}) $$
 
-$$ P(a, b ; \mathbf{u}, \mathbf{v}) = \sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) \prod_{b' \in B^* \subseteq B} \left( 1 - \sigma \left( \mathbf{u}_a^T \mathbf{v}_{b'} \right) \right) $$
+Focusing on a single triplet $(a, b, y)$, the resulting NLL and its partial derivative are:
 
-$$ \mathcal{L} (a, b ; \mathbf{u}, \mathbf{v}) = -\log \sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) - \sum_{b' \in B^* \subseteq B} \log \left( 1 - \sigma \left( \mathbf{u}_a^T \mathbf{v}_{b'} \right) \right) $$
+$$ \mathcal{L} (a, b, y; \mathbf{u}, \mathbf{v}) = P(y \mid a, b; \mathbf{u}, \mathbf{v}) $$
 
-For more details, see Goldberg and Levy's notes [@goldberg2014word2vec].
+$$ l(a, b, y; \mathbf{u}, \mathbf{v}) = - \log \mathcal{L} (a, b, y; \mathbf{u}, \mathbf{v}) $$
 
+$$ \frac{\partial l (a, b ; \mathbf{u}, \mathbf{v})}{\partial f(a, b ; \mathbf{u}, \mathbf{v})} = \sigma(f(a, b ; \mathbf{u}, \mathbf{v})) - y $$
 
-### Gradient computation
+Therefore:
 
-In order to apply gradient descent, partial derivatives must be computed.
-As this is a sum, let us identify the two main terms:
+$$ \frac{\partial l (a, b ; \mathbf{u}, \mathbf{v})}{\partial \mathbf{u}_a} = \left( \sigma(\mathbf{u}_a^T \mathbf{v}_b) - y \right) \mathbf{v}_b^T $$
 
-$$
-    \begin{array}{lll}
-    \frac{\partial}{\partial \mathbf{u}_a} -\log \sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) & = &
-    -\frac{\sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) \left( 1 - \sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) \right) }{\sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right)} \mathbf{v}_b \\
-    & = & \left( \sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) - 1 \right) \mathbf{v}_b
-    \end{array}
-$$
+$$ \frac{\partial l (a, b ; \mathbf{u}, \mathbf{v})}{\partial \mathbf{v}_b} = \left( \sigma(\mathbf{u}_a^T \mathbf{v}_b) - y \right) \mathbf{u}_a^T $$
 
-$$
-    \begin{array}{lll}
-    \frac{\partial}{\partial \mathbf{u}_a} -\log \left( 1 - \sigma \left( \mathbf{u}_a^T \mathbf{v}_{b'} \right) \right) & = &
-    -\frac{- \sigma \left( \mathbf{u}_a^T \mathbf{v}_{b'} \right) \left( 1 - \sigma \left( \mathbf{u}_a^T \mathbf{v}_{b'} \right) \right) }{1 - \sigma \left( \mathbf{u}_a^T \mathbf{v}_{b'} \right)} \mathbf{v}_{b'} \\
-    & = & \sigma \left( \mathbf{u}_a^T \mathbf{v}_{b'} \right) \mathbf{v}_{b'}
-    \end{array}
-$$
+These two formulas are implemented in [`do_step`](api.md#itembed.do_step), as part of the gradient descent algorithm.
 
-As both terms are similar, we can rewrite them using the associated label $y$:
+!!! note
 
-$$ \ell_{a, b, y} = \left( \sigma \left( \mathbf{u}_a^T \mathbf{v}_b \right) - y \right) \mathbf{v}_b $$
-
-Therefore, the overall gradient is:
-
-$$
-    \frac{\partial}{\partial \mathbf{u}_a} \mathcal{L} (a, b ; \mathbf{u}, \mathbf{v}) =
-    \ell_{a, b, 1} + \sum_{b' \in B^* \subseteq B} \ell_{a, b', 0}
-$$
-
-A similar expansion can be done for $\frac{\partial}{\partial \mathbf{v}_b} \mathcal{L} (a, b ; \mathbf{u}, \mathbf{v})$.
-
-
-## Additional considerations
-
-
-### Normalization
-
-By setting the denominator to 1, as proposed above, the model essentially learns to self-normalize.
-However, Devlin et al. [@devlin2014fast] suggest to add a squared error penalty to enforce the equivalence.
-Andreas and Klein [@andreas2015and] even suggest that it should even be sufficient to only normalize a fraction of the training examples and still obtain approximate self-normalising behaviour.
-
-
-### Item distribution balancing
-
-In word2vec, Mikolov et al. [@mikolov2013distributed] use a subsampling approach to reduce the impact of frequent words.
-Each word has a probability
-
-$$ P(w_i) = 1 - \sqrt{ \left( \frac{t}{f(w_i)} \right) } $$
-
-of being discarded, where $f(w_i)$ is its frequency and $t$ a chosen threshold, typically $10^{-5}$.
+    For more details about the inner workings of word2vec, see Goldberg and Levy's notes[@goldberg2014word2vec].
