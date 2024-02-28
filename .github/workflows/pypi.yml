@@ -41,8 +41,8 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: testpypi
-      url: https://test.pypi.org/p/itembed
+      name: pypi
+      url: https://pypi.org/p/itembed
 
     permissions:
       id-token: write
@@ -55,10 +55,8 @@ jobs:
         name: python-package-distributions
         path: ./dist/
 
-    - name: Publish to TestPyPI
+    - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        repository-url: https://test.pypi.org/legacy/
 
   release:
     needs: publish
