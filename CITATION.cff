@@ -4,6 +4,6 @@ authors:
 - family-names: "Berdat"
   given-names: "Johan"
 title: "itembed"
-version: 0.6.0
-date-released: 2024-01-30
+version: 0.5.1
+date-released: 2024-02-28
 url: "https://github.com/jojolebarjos/itembed"

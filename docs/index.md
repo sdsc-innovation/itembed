@@ -19,7 +19,7 @@ If you use this software in your work, it would be appreciated if you would cite
   author = {Johan Berdat},
   title = {itembed},
   url = {https://github.com/jojolebarjos/itembed},
-  version = {0.6.0},
-  date = {2024-xx-xx},
+  version = {0.5.1},
+  date = {2024-02-28},
 }
 ```
