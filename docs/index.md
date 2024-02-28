@@ -18,7 +18,7 @@ If you use this software in your work, it would be appreciated if you would cite
 @software{itembed,
   author = {Johan Berdat},
   title = {itembed},
-  url = {https://github.com/jojolebarjos/itembed},
+  url = {https://github.com/sdsc-innovation/itembed},
   version = {0.5.1},
   date = {2024-02-28},
 }

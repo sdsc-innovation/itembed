@@ -1,6 +1,6 @@
 site_name: itembed
-site_url: http://jojolebarjos.github.io/itembed
-repo_url: https://github.com/jojolebarjos/itembed
+site_url: http://sdsc-innovation.github.io/itembed
+repo_url: https://github.com/sdsc-innovation/itembed
 
 nav:
   - Home: index.md

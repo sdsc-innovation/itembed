@@ -10,7 +10,7 @@ pip install itembed
 To install directly from source:
 
 ```
-pip install git+https://github.com/jojolebarjos/itembed.git
+pip install git+https://github.com/sdsc-innovation/itembed.git
 ```
 
 After installation, you can verify by checking the version:

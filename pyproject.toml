@@ -43,9 +43,9 @@ classifiers = [
 dynamic = ["version"]
 
 [project.urls]
-Documentation = "https://jojolebarjos.github.io/itembed/"
-Repository = "https://github.com/jojolebarjos/itembed.git"
-Issues = "https://github.com/jojolebarjos/itembed/issues"
+Documentation = "https://sdsc-innovation.github.io/itembed/"
+Repository = "https://github.com/sdsc-innovation/itembed.git"
+Issues = "https://github.com/sdsc-innovation/itembed/issues"
 
 [tool.setuptools.dynamic]
 version = {attr = "itembed.__version__"}

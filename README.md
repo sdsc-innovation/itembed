@@ -21,7 +21,7 @@ pip install itembed
 Or install from source, to ensure latest version:
 
 ```
-pip install git+https://github.com/jojolebarjos/itembed.git
+pip install git+https://github.com/sdsc-innovation/itembed.git
 ```
 
-Please refer to the [documentation](http://jojolebarjos.github.io/itembed) for detailed explanations and examples.
+Please refer to the [documentation](http://sdsc-innovation.github.io/itembed) for detailed explanations and examples.
