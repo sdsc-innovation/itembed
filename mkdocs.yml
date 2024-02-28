@@ -9,10 +9,7 @@ nav:
   - math.md
   - api.md
   - Examples:
-    - notebooks/recipes.ipynb
-    - notebooks/retail.ipynb
     - notebooks/stackoverflow.ipynb
-    - notebooks/word2vec.ipynb
 
 theme:
   name: material
@@ -48,7 +45,9 @@ plugins:
             signature_crossrefs: true
   - bibtex:
       bib_file: docs/references.bib
-  - mkdocs-jupyter
+  - mkdocs-jupyter:
+      include: ["*.ipynb"]
+      ignore: [".ipynb_checkpoints/*.ipynb"]
 
 markdown_extensions:
   - admonition

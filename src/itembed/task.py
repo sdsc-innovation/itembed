@@ -29,8 +29,6 @@ class UnsupervisedTask(Task):
         Itemsets, concatenated.
     offsets: int32, num_itemset + 1
         Boundaries in packed items.
-    indices: int32, num_step
-        Subset of offsets to consider.
     syn0: float32, num_label x num_dimension
         First set of embeddings.
     syn1: float32, num_label x num_dimension

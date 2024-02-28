@@ -125,7 +125,7 @@ Tasks fall into two categories:
  2. _Supervised tasks_ capture explicit relationships between items across different itemsets and domains, as proposed by StarSpace[@wu2017starspace].
 
 Although our current example focuses solely on a single domain — ingredients — more complex scenarios might encompass multiple domains.
-This broader application is demonstrated in the detailed [cooking recipes](notebooks/recipes.ipynb) example, which integrates ingredients and cuisine styles into a unified training framework through two distinct tasks.
+Broader applications may integrate multiple tasks into a unified training framework.
 
 In addition to itemsets, a task also requires the embedding sets, or _synsets_, which are adjusted during the training phase.
 These synsets constitute the end product of the training process, typically starting from a state of random initialization.

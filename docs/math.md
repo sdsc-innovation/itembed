@@ -48,7 +48,7 @@ $$ f(a, b ; \mathbf{u}, \mathbf{v}) = \mathbf{u}_a^T \mathbf{v}_b $$
 
 In the context of multi-class classification, the [softmax function](https://en.wikipedia.org/wiki/Softmax_function) is used to model the conditional probability of observing class $b$ given input $a$:
 
-$$ P(b \mid a ; \mathbf{u}, \mathbf{v}) = \frac{e^{f(a, b ; \mathbf{u}, \mathbf{v})}}{\sum_{b'} e^{f(a, b ; \mathbf{u}, \mathbf{v})}} $$
+$$ P(b \mid a ; \mathbf{u}, \mathbf{v}) = \frac{e^{f(a, b ; \mathbf{u}, \mathbf{v})}}{\sum_{b' \in B} e^{f(a, b ; \mathbf{u}, \mathbf{v})}} $$
 
 The likelihood quantifies how well the model parameters, $\mathbf{u}$ and $\mathbf{v}$, explain the observed data.
 During training, these parameters are adjusted to maximize the likelihood, representing the joint probability of the training data.
@@ -95,7 +95,7 @@ For every genuine sample pair $(a, b)$, $k$ negative counterparts $(a, b_i')$ ar
 
 For positive samples (where $y=1$), the probability corresponds to the softmax formulation:
 
-$$ P(b \mid y=1, a; \mathbf{u}, \mathbf{v}) = \frac{e^{f(a, b ; \mathbf{u}, \mathbf{v})}}{\sum_{b'} e^{f(a, b ; \mathbf{u}, \mathbf{v})}} $$
+$$ P(b \mid y=1, a; \mathbf{u}, \mathbf{v}) = \frac{e^{f(a, b ; \mathbf{u}, \mathbf{v})}}{\sum_{b' \in B} e^{f(a, b ; \mathbf{u}, \mathbf{v})}} $$
 
 For negative samples (where $y=0$), $b$ is sampled from $\eta$.
 For instance, assuming $\eta$ is uniform:
