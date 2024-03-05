@@ -1,6 +1,6 @@
 # Welcome to `itembed`
 
-This is yet another variation of the well-known word2vec method, proposed by Mikolov et al.[@mikolov2013efficient], applied to unordered sequences, which are commonly referred as itemsets.
+This is yet another variation of the well-known word2vec method, proposed by Mikolov et al.[@mikolov2013efficient], applied to unordered sequences, which are commonly referred to as itemsets.
 The contribution of `itembed` is twofold:
 
  1. Modifying the base algorithm to handle unordered sequences, which has an impact on the definition of context windows;
