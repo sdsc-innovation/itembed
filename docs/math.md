@@ -121,7 +121,7 @@ $$ l (a, b ; \mathbf{u}, \mathbf{v}) = - \log P(y = 1 \mid a, b; \mathbf{u}, \ma
 At this point, it should be noted that both terms still depend on the softmax function over the whole $B$ set.
 Both Mnih and Teh[@mnih2012fast] and Vaswani et al.[@vaswani2013decoding] discuss the computational cost of the softmax function denominator, acting as a normalization term:
 
-$$ P(b \mid y=1, a; \mathbf{u}, \mathbf{v}) = \frac{e^{f(a, b ; \mathbf{u}, \mathbf{v})}}{\sum_{b'} e^{f(a, b ; \mathbf{u}, \mathbf{v})}} = \frac{e^{f(a, b ; \mathbf{u}, \mathbf{v})}}{Z_{\mathbf{u}, \mathbf{v}}(a)} $$
+$$ P(b \mid y=1, a; \mathbf{u}, \mathbf{v}) = \frac{e^{f(a, b ; \mathbf{u}, \mathbf{v})}}{\sum_{b'} e^{f(a, b' ; \mathbf{u}, \mathbf{v})}} = \frac{e^{f(a, b ; \mathbf{u}, \mathbf{v})}}{Z_{\mathbf{u}, \mathbf{v}}(a)} $$
 
 To mitigate this, one proposed strategy involves introducing trainable parameters $z_a$, aimed at approximating $Z_{\mathbf{u}, \mathbf{v}}(a)$ and being optimized jointly during the training process.
 Interestingly, Mnih and Teh found that simply setting $z_a=1$ does not affect model performance.
